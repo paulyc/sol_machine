@@ -28,16 +28,17 @@ contract TestStackOwner {
     StackOwner ownerUnderTest;
 
     function TestStackOwner() {
-        ownerUnderTest = StackOwner(1024);
     }
 
     function testInit() {
+        ownerUnderTest = new StackOwner(1024);
         require(ownerUnderTest.isEmpty());
         require(ownerUnderTest.capacity() == 1024);
         require(ownerUnderTest.size() == 0);
     }
 
     function testPush() {
+        ownerUnderTest = new StackOwner(1024);
         ownerUnderTest.push(1);
         require(!ownerUnderTest.isEmpty());
         require(ownerUnderTest.size() == 1);
@@ -50,6 +51,10 @@ contract TestStackOwner {
     }
 
     function testPop() {
+        ownerUnderTest = new StackOwner(1024);
+        ownerUnderTest.push(1);
+        ownerUnderTest.push(2);
+        ownerUnderTest.push(3);
         require(ownerUnderTest.pop() == 3);
         require(ownerUnderTest.top() == 2);
         require(ownerUnderTest.size() == 2);
@@ -59,5 +64,19 @@ contract TestStackOwner {
         require(ownerUnderTest.isEmpty());
         require(ownerUnderTest.size() == 0);
         require(ownerUnderTest.capacity() == 1024);
+    }
+
+    function testSetTop() {
+        ownerUnderTest = new StackOwner(1024);
+        ownerUnderTest.push(1);
+        ownerUnderTest.push(2);
+        ownerUnderTest.push(3);
+        require(ownerUnderTest.setTop(4) == 3);
+        require(ownerUnderTest.top() == 4);
+        require(ownerUnderTest.size() == 3);
+        require(ownerUnderTest.pop() == 4);
+        require(ownerUnderTest.pop() == 2);
+        require(ownerUnderTest.pop() == 1);
+        require(ownerUnderTest.isEmpty());
     }
 }

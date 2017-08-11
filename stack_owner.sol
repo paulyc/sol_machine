@@ -65,4 +65,11 @@ contract StackOwner {
             _stackPointer - (offset + 1) < _stack.length);
         return _stack[_stackPointer - (offset + 1)];
     }
+
+    function setTop(uint256 value) returns (uint256) {
+        require(_stackPointer > 0);
+        uint256 top = top();
+        _stack[_stackPointer - 1] = value;
+        return top;
+    }
 }

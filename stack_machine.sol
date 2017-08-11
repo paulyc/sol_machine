@@ -55,70 +55,68 @@ contract AbstractStackMachine is StackOwner {
     }
     
     function executeAdd() internal returns (ExecutionStatus) {
-        --_stackPointer;
-        _stack[_stackPointer] += _stack[_stackPointer - 1];
+        uint256 lhs = pop();
+        setTop(lhs + top());
         return ExecutionStatus.EXECUTING;
     }
     
     function executeMul() internal returns (ExecutionStatus) {
-        --_stackPointer;
-        _stack[_stackPointer] *= _stack[_stackPointer - 1];
+        uint256 lhs = pop();
+        setTop(lhs * top());
         return ExecutionStatus.EXECUTING;
     }
     
     function executeSub() internal returns (ExecutionStatus) {
-        --_stackPointer;
-        _stack[_stackPointer] -= _stack[_stackPointer - 1];
+        uint256 lhs = pop();
+        setTop(lhs - top());
         return ExecutionStatus.EXECUTING;
     }
 
     function executeDiv() internal returns (ExecutionStatus) {
-        --_stackPointer;
-        uint256 denominator = _stack[_stackPointer - 1];
+        uint256 numerator = pop();
+        uint256 denominator = top();
         if (denominator == 0) {
-            _stack[_stackPointer] = 0;
+            setTop(0);
         } else {
-            _stack[_stackPointer] /= denominator;
+            setTop(numerator / denominator);
         }
         return ExecutionStatus.EXECUTING;
     }
 
     function executeSdiv() internal returns (ExecutionStatus) {
-        --_stackPointer;
-        int256 numerator = int256(_stack[_stackPointer]);
-        int256 denominator = int256(_stack[_stackPointer - 1]);
+        int256 numerator = int256(pop());
+        int256 denominator = int256(top());
         if (denominator == 0) {
-            _stack[_stackPointer] = 0;
+            setTop(0);
         } else if (numerator == 0x800000000000000000000000000000000000000000000000 && denominator == -1) {
             // If you were wondering, 0x800000000000000000000000000000000000000000000000 is binary 2's complement for -2^255
             // and although -2^255 / -1 = 2^255 in normal math, in signed 256-bit 2's complement, it overflows,
             // so the actual result here is -2^255. Don't ask me, I don't make the rules, I just implement them
-            _stack[_stackPointer] = 0x800000000000000000000000000000000000000000000000;
+            setTop(0x800000000000000000000000000000000000000000000000);
         } else {
-            _stack[_stackPointer] = uint256(numerator / denominator);
+            setTop(uint256(numerator / denominator));
         }
         return ExecutionStatus.EXECUTING;
     }
 
     function executeMod() internal returns (ExecutionStatus) {
-        --_stackPointer;
-        uint256 denominator = _stack[_stackPointer - 1];
+        uint256 numerator = pop();
+        uint256 denominator = top();
         if (denominator == 0) {
-            _stack[_stackPointer] = 0;
+            setTop(0);
         } else {
-            _stack[_stackPointer] %= denominator;
+            setTop(numerator % denominator);
         }
         return ExecutionStatus.EXECUTING;
     }
 
     function executeSmod() internal returns (ExecutionStatus) {
-        --_stackPointer;
-        int256 numerator = int256(_stack[_stackPointer]);
-        int256 denominator = int256(_stack[_stackPointer - 1]);
+        int256 numerator = int256(pop());
+        int256 denominator = int256(top());
         if (denominator == 0) {
-            _stack[_stackPointer] = 0;
+            setTop(0);
         } else {
-            _stack[_stackPointer] = uint256(numerator % denominator);
+            setTop(uint256(numerator % denominator));
         }
         return ExecutionStatus.EXECUTING;
     }
