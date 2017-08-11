@@ -24,7 +24,6 @@ pragma solidity ^0.4.15;
 
 import './abstract_stack_machine.sol';
 import '../ethereum_specification.sol';
-import '../evm_stack.sol';
 
 contract StopAndArithmeticOperationsMachine is AbstractStackMachine {
     function StopAndArithmeticOperationsMachine() AbstractStackMachine() {
@@ -44,24 +43,28 @@ contract StopAndArithmeticOperationsMachine is AbstractStackMachine {
 
     function executeStop(ExecutionContext context) internal {
         context.halt();
+        context.consumeGas(1);
     }
 
     function executeAdd(ExecutionContext context) internal {
         EvmStack stack = context.getStack();
         uint256 lhs = stack.pop();
         stack.swapTop(lhs + stack.top());
+        context.consumeGas(1);
     }
 
     function executeMul(ExecutionContext context) internal {
         EvmStack stack = context.getStack();
         uint256 lhs = stack.pop();
         stack.swapTop(lhs * stack.top());
+        context.consumeGas(1);
     }
 
     function executeSub(ExecutionContext context) internal {
         EvmStack stack = context.getStack();
         uint256 lhs = stack.pop();
         stack.swapTop(lhs - stack.top());
+        context.consumeGas(1);
     }
 
     function executeDiv(ExecutionContext context) internal {
@@ -73,6 +76,7 @@ contract StopAndArithmeticOperationsMachine is AbstractStackMachine {
         } else {
             stack.swapTop(numerator / denominator);
         }
+        context.consumeGas(1);
     }
 
     function executeSdiv(ExecutionContext context) internal {
@@ -89,6 +93,7 @@ contract StopAndArithmeticOperationsMachine is AbstractStackMachine {
         } else {
             stack.swapTop(uint256(numerator / denominator));
         }
+        context.consumeGas(1);
     }
 
     function executeMod(ExecutionContext context) internal {
@@ -100,6 +105,7 @@ contract StopAndArithmeticOperationsMachine is AbstractStackMachine {
         } else {
             stack.swapTop(numerator % denominator);
         }
+        context.consumeGas(1);
     }
 
     function executeSmod(ExecutionContext context) internal {
@@ -111,6 +117,7 @@ contract StopAndArithmeticOperationsMachine is AbstractStackMachine {
         } else {
             stack.swapTop(uint256(numerator % denominator));
         }
+        context.consumeGas(1);
     }
 
     function executeAddmod(ExecutionContext context) internal {

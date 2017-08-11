@@ -24,12 +24,11 @@ pragma solidity ^0.4.15;
 
 import '../ethereum_specification.sol';
 import '../ethereum_abi.sol';
-import '../logging.sol';
 
 contract ExecutionContext is EvmSpec {
     SystemState _state;
     AbstractStackMachine _vm;
-    TransactionSubstate _substate;
+    uint256 _gasConsumed;
 
     function ExecutionContext(AbstractStackMachine vm) {
         _state.status = ExecutionStatus.PRE_EXECUTION;
@@ -57,10 +56,6 @@ contract ExecutionContext is EvmSpec {
         return _state.stack;
     }
 
-    function getGasConsumed() returns (uint256) {
-        return _substate.gasConsumed;
-    }
-
     function setStatus(EvmSpec.ExecutionStatus status) {
         _state.status = status;
     }
@@ -74,7 +69,11 @@ contract ExecutionContext is EvmSpec {
     }
 
     function consumeGas(uint256 gas) {
-        _substate.gasConsumed += gas;
+        _gasConsumed += gas;
+    }
+
+    function getGasConsumed() returns (uint256) {
+        return _gasConsumed;
     }
 }
 

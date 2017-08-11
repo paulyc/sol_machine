@@ -23,7 +23,8 @@
 pragma solidity ^0.4.15;
 
 import './ethereum_specification.sol';
-import './machine/evm_stack_machine.sol';
+import './machine/abstract_stack_machine.sol';
+import './logging.sol';
 
 /**
 A transaction (formally, T) is a single cryptographically-signed instruction constructed
@@ -34,6 +35,20 @@ calls and those which result in the creation of new accounts with associated cod
 informally as ‘contract creation’)
 */
 contract Transaction is EvmSpec {
+
+    struct AccumulatedSubstate {
+        address[] selfDestructSet;
+        Logging.LogEntry[] logSeries;
+        uint256 refundBalance;
+        uint256 gasConsumed;
+    }
+
+    struct Receipt {
+        SystemState postTransactionState;
+        uint256 gasConsumed;
+        Logging.LogEntry[] logSeries;
+        uint256 bloomFilter;
+    }
 
     TransactionData _txdata;
 
@@ -49,8 +64,8 @@ contract Transaction is EvmSpec {
         _txdata.initOrInput = initOrInput;
     }
 
-    function execute(EthereumStackMachine virtualMachine, uint256 preRemainingGas) internal
-        returns (uint256 postRemainingGas, TransactionSubstate, byte[] output);
+    function execute(AbstractStackMachine virtualMachine, uint256 preRemainingGas) internal
+        returns (uint256 postRemainingGas, AccumulatedSubstate, byte[] output);
     
     function verifyTransaction() {
         /**
@@ -73,10 +88,10 @@ contract ContractCreationTransaction is Transaction {
         Transaction(gasPrice, gasLimit, to, value, v, r, s, init) {
     }
 
-    TransactionSubstate substate;
+    AccumulatedSubstate substate;
 
-    function execute(EthereumStackMachine virtualMachine, uint256 remainingGas) internal
-            returns (uint256 newRemainingGas, TransactionSubstate, byte[] output)  {
+    function execute(AbstractStackMachine virtualMachine, uint256 remainingGas) internal
+            returns (uint256 newRemainingGas, AccumulatedSubstate, byte[] output)  {
         ExecutionContext context = virtualMachine.getContext();
         context.executeTransactionCode(_txdata.initOrInput);
         return (remainingGas - context.getGasConsumed(), substate, new byte[](1));

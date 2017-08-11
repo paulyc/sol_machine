@@ -83,16 +83,6 @@ contract EvmSpec {
         uint256 mixHash;       // A 256-bit hash which proves combined with the nonce that a sufficient amount of compu- tation has been carried out on this block; formally H_m.
         uint64  nonce;         // A 64-bit hash which proves combined with the mix-hash that a sufficient amount of compu- tation has been carried out on this block; formally H_n.
     }
-    
-    struct LogTopic {
-        byte[32] topic;
-    }
-
-    struct LogEntry {
-        address loggersAddress;
-        LogTopic[] topics;
-        byte[] data;
-    }
 
     struct TransactionData {
         uint256 nonce;     // A scalar value equal to the number of trans- actions sent by the sender; formally T_n
@@ -105,19 +95,5 @@ contract EvmSpec {
         uint256 r;
         uint256 s;
         byte[]  initOrInput; // init code for contract creation, input data for message passing
-    }
-
-    struct TransactionSubstate {
-        address[] selfDestructSet;
-        LogEntry[] logSeries;
-        uint256 refundBalance;
-        uint256 gasConsumed;
-    }
-
-    struct TransactionReceipt {
-        SystemState postTransactionState;
-        uint256 gasConsumed;
-        LogEntry[] logSeries;
-        uint256 bloomFilter;
     }
 }
