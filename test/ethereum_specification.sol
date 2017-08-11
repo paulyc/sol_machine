@@ -22,7 +22,7 @@
 
 pragma solidity ^0.4.15;
 
-import '../environment.sol';
+import '../ethereum_specification.sol';
 
-contract TestEnvironment {
+contract TestEvmSpec {
 }

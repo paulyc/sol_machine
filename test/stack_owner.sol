@@ -26,19 +26,21 @@ import '../stack_owner.sol';
 
 contract TestStackOwner {
     StackOwner ownerUnderTest;
+    uint256[1024] stackBacking; // shouldn't matter if shared between tests
+                                // since stack pointer resets
 
     function TestStackOwner() {
     }
 
     function testInit() {
-        ownerUnderTest = new StackOwner(1024);
+        ownerUnderTest = new StackOwner(stackBacking);
         require(ownerUnderTest.isEmpty());
         require(ownerUnderTest.capacity() == 1024);
         require(ownerUnderTest.size() == 0);
     }
 
     function testPush() {
-        ownerUnderTest = new StackOwner(1024);
+        ownerUnderTest = new StackOwner(stackBacking);
         ownerUnderTest.push(1);
         require(!ownerUnderTest.isEmpty());
         require(ownerUnderTest.size() == 1);
@@ -51,7 +53,7 @@ contract TestStackOwner {
     }
 
     function testPop() {
-        ownerUnderTest = new StackOwner(1024);
+        ownerUnderTest = new StackOwner(stackBacking);
         ownerUnderTest.push(1);
         ownerUnderTest.push(2);
         ownerUnderTest.push(3);
@@ -67,7 +69,7 @@ contract TestStackOwner {
     }
 
     function testSwapTop() {
-        ownerUnderTest = new StackOwner(1024);
+        ownerUnderTest = new StackOwner(stackBacking);
         ownerUnderTest.push(1);
         ownerUnderTest.push(2);
         ownerUnderTest.push(3);

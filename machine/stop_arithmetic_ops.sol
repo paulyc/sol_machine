@@ -41,94 +41,94 @@ contract StopAndArithmeticOperationsMachine is AbstractStackMachine, EvmSpec {
         _operandDispatchTable[OP_SIGNEXTEND] = executeSignextend;
     }
 
-    function executeStop() internal returns (ExecutionStatus) {
+    function executeStop() internal returns (EvmSpec.ExecutionStatus) {
         return halt();
     }
 
-    function executeAdd() internal returns (ExecutionStatus) {
-        uint256 lhs = pop();
-        swapTop(lhs + top());
-        return ExecutionStatus.EXECUTING;
+    function executeAdd() internal returns (EvmSpec.ExecutionStatus) {
+        uint256 lhs = _stack.pop();
+        _stack.swapTop(lhs + _stack.top());
+        return EvmSpec.ExecutionStatus.EXECUTING;
     }
 
-    function executeMul() internal returns (ExecutionStatus) {
-        uint256 lhs = pop();
-        swapTop(lhs * top());
-        return ExecutionStatus.EXECUTING;
+    function executeMul() internal returns (EvmSpec.ExecutionStatus) {
+        uint256 lhs = _stack.pop();
+        _stack.swapTop(lhs * _stack.top());
+        return EvmSpec.ExecutionStatus.EXECUTING;
     }
 
-    function executeSub() internal returns (ExecutionStatus) {
-        uint256 lhs = pop();
-        swapTop(lhs - top());
-        return ExecutionStatus.EXECUTING;
+    function executeSub() internal returns (EvmSpec.ExecutionStatus) {
+        uint256 lhs = _stack.pop();
+        _stack.swapTop(lhs - _stack.top());
+        return EvmSpec.ExecutionStatus.EXECUTING;
     }
 
-    function executeDiv() internal returns (ExecutionStatus) {
-        uint256 numerator = pop();
-        uint256 denominator = top();
+    function executeDiv() internal returns (EvmSpec.ExecutionStatus) {
+        uint256 numerator = _stack.pop();
+        uint256 denominator = _stack.top();
         if (denominator == 0) {
-            swapTop(0);
+            _stack.swapTop(0);
         } else {
-            swapTop(numerator / denominator);
+            _stack.swapTop(numerator / denominator);
         }
-        return ExecutionStatus.EXECUTING;
+        return EvmSpec.ExecutionStatus.EXECUTING;
     }
 
-    function executeSdiv() internal returns (ExecutionStatus) {
-        int256 numerator = int256(pop());
-        int256 denominator = int256(top());
+    function executeSdiv() internal returns (EvmSpec.ExecutionStatus) {
+        int256 numerator = int256(_stack.pop());
+        int256 denominator = int256(_stack.top());
         if (denominator == 0) {
-            swapTop(0);
+            _stack.swapTop(0);
         } else if (numerator == 0x800000000000000000000000000000000000000000000000 && denominator == -1) {
             // If you were wondering, 0x800000000000000000000000000000000000000000000000 is binary 2's complement for -2^255
             // and although -2^255 / -1 = 2^255 in normal math, in signed 256-bit 2's complement, it overflows,
             // so the actual result here is -2^255. Don't ask me, I don't make the rules, I just implement them
-            swapTop(0x800000000000000000000000000000000000000000000000);
+            _stack.swapTop(0x800000000000000000000000000000000000000000000000);
         } else {
-            swapTop(uint256(numerator / denominator));
+            _stack.swapTop(uint256(numerator / denominator));
         }
-        return ExecutionStatus.EXECUTING;
+        return EvmSpec.ExecutionStatus.EXECUTING;
     }
 
-    function executeMod() internal returns (ExecutionStatus) {
-        uint256 numerator = pop();
-        uint256 denominator = top();
+    function executeMod() internal returns (EvmSpec.ExecutionStatus) {
+        uint256 numerator = _stack.pop();
+        uint256 denominator = _stack.top();
         if (denominator == 0) {
-            swapTop(0);
+            _stack.swapTop(0);
         } else {
-            swapTop(numerator % denominator);
+            _stack.swapTop(numerator % denominator);
         }
-        return ExecutionStatus.EXECUTING;
+        return EvmSpec.ExecutionStatus.EXECUTING;
     }
 
-    function executeSmod() internal returns (ExecutionStatus) {
-        int256 numerator = int256(pop());
-        int256 denominator = int256(top());
+    function executeSmod() internal returns (EvmSpec.ExecutionStatus) {
+        int256 numerator = int256(_stack.pop());
+        int256 denominator = int256(_stack.top());
         if (denominator == 0) {
-            swapTop(0);
+            _stack.swapTop(0);
         } else {
-            swapTop(uint256(numerator % denominator));
+            _stack.swapTop(uint256(numerator % denominator));
         }
-        return ExecutionStatus.EXECUTING;
+        return EvmSpec.ExecutionStatus.EXECUTING;
     }
 
-    function executeAddmod() internal returns (ExecutionStatus) {
+    function executeAddmod() internal returns (EvmSpec.ExecutionStatus) {
         // stubbed no-op
-        return ExecutionStatus.EXECUTING;
+        return EvmSpec.ExecutionStatus.EXECUTING;
     }
 
-    function executeMulmod() internal returns (ExecutionStatus) {
+    function executeMulmod() internal returns (EvmSpec.ExecutionStatus) {
         // stubbed no-op
-        return ExecutionStatus.EXECUTING;
+        return EvmSpec.ExecutionStatus.EXECUTING;
     }
 
-    function executeExp() internal returns (ExecutionStatus) {
+    function executeExp() internal returns (EvmSpec.ExecutionStatus) {
         // stubbed no-op
-        return ExecutionStatus.EXECUTING;
+        return EvmSpec.ExecutionStatus.EXECUTING;
     }
 
-    function executeSignextend() internal returns (ExecutionStatus) {
+    function executeSignextend() internal returns (EvmSpec.ExecutionStatus) {
         // stubbed no-op
-        return ExecutionStatus.EXECUTING;
+        return EvmSpec.ExecutionStatus.EXECUTING;
     }
 }

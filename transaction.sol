@@ -23,7 +23,6 @@
 pragma solidity ^0.4.15;
 
 import './ethereum_specification.sol';
-import './logging.sol';
 
 /**
 A transaction (formally, T) is a single cryptographically-signed instruction constructed
@@ -34,48 +33,24 @@ calls and those which result in the creation of new accounts with associated cod
 informally as ‘contract creation’)
 */
 contract Transaction {
-
-    
-    struct Refund {
-        
-    }
-    
-    struct Suicide {
-        
-    }
-    
-    struct AccruedSubstate {
-        Suicide[] suicidesSet;
-        Logging.LogEntry[] logSeries;
-        Refund[] refunds;
-    }
-
-    uint256 _nonce; // A scalar value equal to the number of trans- actions sent by the sender; formally T_n
-    uint256 _gasPrice; // A scalar value equal to the number of Wei to be paid per unit of gas for all computa- tion costs incurred as a result of the execution of this transaction; formally T_p
-    uint256 _gasLimit; // A scalar value equal to the maximum amount of gas that should be used in executing this transaction. This is paid up-front, before any computation is done and may not be increased later; formally T_g
-    address _to; // The 160-bit address of the message call’s recipi- ent or, for a contract creation transaction, ∅, used here to denote the only member of B0 ; formally T_t
-    uint256 _value; // A scalar value equal to the number of Wei to be transferred to the message call’s recipient or, in the case of contract creation, as an endowment to the newly created account; formally T_v
-    // Values corresponding to the signature of the transaction and used to determine the sender of the transaction; formally T_w, T_r and T_s
-    uint8 _v;
-    uint256 _r;
-    uint256 _s;
+    EvmSpec.TransactionData _data;
 
     function Transaction(uint256 gasPrice, uint256 gasLimit, address to, uint256 value, uint8 v, uint256 r, uint256 s) {
-        _nonce = 0;
-        _gasPrice = gasPrice;
-        _gasLimit = gasLimit;
-        _to = to;
-        _value = value;
-        _v = v;
-        _r = r;
-        _s = s;
+        _data.nonce = 0;
+        _data.gasPrice = gasPrice;
+        _data.gasLimit = gasLimit;
+        _data.to = to;
+        _data.value = value;
+        _data.v = v;
+        _data.r = r;
+        _data.s = s;
     }
 
-    function execute(EvmSpec.SystemState systemState,
+    function execute(EvmSpec.ExecutionContext systemState,
                      uint256 remainingGas,
                      EvmSpec.ExecutionEnvironment executionEnvironment) private
-            returns (EvmSpec.SystemState, uint256, AccruedSubstate, byte[]) {
-        AccruedSubstate storage accruedSubstate;
+            returns (EvmSpec.ExecutionContext, uint256, EvmSpec.AccruedTransactionSubstate, byte[]) {
+        EvmSpec.AccruedTransactionSubstate storage accruedSubstate;
         byte[] storage output;
         return (systemState, remainingGas, accruedSubstate, output);
     }

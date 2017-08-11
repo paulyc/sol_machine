@@ -22,14 +22,16 @@
 
 pragma solidity ^0.4.15;
 
-import './transaction.sol';
+import './ethereum_specification.sol';
 
 contract Block {
     EvmSpec.BlockHeader _blockHeader;
     EvmSpec.BlockHeader[] _ommerBlockHeaders;
-    Transaction[] _transactions;
+    EvmSpec.TransactionData[] _transactions;
 
-    function Block(EvmSpec.BlockHeader header, EvmSpec.BlockHeader[] ommerBlockHeaders, Transaction[] transactions) {
+    function Block(EvmSpec.BlockHeader header,
+                   EvmSpec.BlockHeader[] ommerBlockHeaders,
+                   EvmSpec.TransactionData[] transactions) internal {
         _blockHeader = header;
         _ommerBlockHeaders = ommerBlockHeaders;
         _transactions = transactions;

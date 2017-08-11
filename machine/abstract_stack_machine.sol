@@ -25,44 +25,32 @@ pragma solidity ^0.4.15;
 import '../ethereum_specification.sol';
 import '../stack_owner.sol';
 
-contract AbstractStackMachine is StackOwner {
-    mapping(byte => function () internal returns (ExecutionStatus)) _operandDispatchTable;
+contract AbstractStackMachine {
+    mapping(byte => function () internal returns (EvmSpec.ExecutionStatus)) _operandDispatchTable;
 
     EvmSpec.WorldState _worldState;
-    EvmSpec.MachineState _machineState;
-    uint256 _gasAvailable;
-    uint256 _programCounter;
+    EvmSpec.ExecutionContext _executionContext;
+    StackOwner _stack;
 
-    enum ExecutionStatus {
-        PRE_EXECUTION,
-        EXECUTING,
-        HALTED
-    }
-    ExecutionStatus _executionStatus;
-
-    struct PostInstructionState {
-
+    function AbstractStackMachine() {
+        _executionContext.programCounter = 0;
+        _executionContext.status = EvmSpec.ExecutionStatus.PRE_EXECUTION;
+        _stack = new StackOwner(_executionContext.stack);
     }
 
-    function AbstractStackMachine() StackOwner(1024) {
-        _machineState.stack = _stack; // may not even be necessary
-        _programCounter = 0;
-        _executionStatus = ExecutionStatus.PRE_EXECUTION;
-    }
-
-    function halt() internal returns (ExecutionStatus) {
-        return ExecutionStatus.HALTED;
+    function halt() internal returns (EvmSpec.ExecutionStatus) {
+        return EvmSpec.ExecutionStatus.HALTED;
     }
 
     function execute(byte[] program) {
-        _executionStatus = ExecutionStatus.EXECUTING;
+        _executionContext.status = EvmSpec.ExecutionStatus.EXECUTING;
 
-        while (_programCounter < program.length) {
-            byte operand = program[_programCounter++];
+        while (_executionContext.programCounter < program.length) {
+            byte operand = program[_executionContext.programCounter++];
 
-            (_executionStatus) = _operandDispatchTable[operand]();
+            (_executionContext.status) = _operandDispatchTable[operand]();
 
-            if (_executionStatus == ExecutionStatus.HALTED) {
+            if (_executionContext.status == EvmSpec.ExecutionStatus.HALTED) {
                 // we are done
                 break;
             }
@@ -70,6 +58,6 @@ contract AbstractStackMachine is StackOwner {
     }
 
     function isHalted() returns (bool) {
-        return _executionStatus == ExecutionStatus.HALTED;
+        return _executionContext.status == EvmSpec.ExecutionStatus.HALTED;
     }
 }

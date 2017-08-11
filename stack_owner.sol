@@ -23,11 +23,11 @@
 pragma solidity ^0.4.15;
 
 contract StackOwner {
-    uint256[] _stack;
-    uint256 _stackPointer; // offset of the invalid element on the very top of stack
+    uint256[1024] _stack;
+    uint256       _stackPointer; // offset of the invalid element on the very top of stack
 
-    function StackOwner(uint256 stackSize) {
-        _stack.length = stackSize;
+    function StackOwner(uint256[1024] stack) {
+        _stack = stack;
         _stackPointer = 0;
     }
 
