@@ -54,7 +54,7 @@ contract AbstractStackMachine is StackOwner {
         return ExecutionStatus.HALTED;
     }
 
-    function execute(bytes program) {
+    function execute(byte[] program) {
         _executionStatus = ExecutionStatus.EXECUTING;
 
         while (_programCounter < program.length) {

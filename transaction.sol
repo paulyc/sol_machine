@@ -74,9 +74,9 @@ contract Transaction {
     function execute(Environment.SystemState systemState, 
                      uint256 remainingGas, 
                      Environment.ExecutionEnvironment executionEnvironment) private
-                     returns (Environment.SystemState, uint256, AccruedSubstate, bytes) {
+                     returns (Environment.SystemState, uint256, AccruedSubstate, byte[]) {
         AccruedSubstate storage accruedSubstate;
-        bytes storage output;
+        byte[] storage output;
         return (systemState, remainingGas, accruedSubstate, output);
     }
     
@@ -95,20 +95,20 @@ contract Transaction {
 }
 
 contract ContractCreationTransaction is Transaction {
-    bytes _init;
+    byte[] _init;
 
     // init: An unlimited size byte array specifying the EVM-code for the account initialisation proce- dure, formally T_i.
-    function ContractCreationTransaction(bytes init, uint256 gasPrice, uint256 gasLimit, address to, uint256 value, uint8 v, uint256 r, uint256 s)
+    function ContractCreationTransaction(byte[] init, uint256 gasPrice, uint256 gasLimit, address to, uint256 value, uint8 v, uint256 r, uint256 s)
         Transaction(gasPrice, gasLimit, to, value, v, r, s) {
         _init = init;
     }
 }
 
 contract MessageCallTransaction is Transaction {
-    bytes _data;
+    byte[] _data;
 
     // An unlimited size byte array specifying the input data of the message call, formally T_d
-    function MessageCallTransaction(bytes data, uint256 gasPrice, uint256 gasLimit, address to, uint256 value, uint8 v, uint256 r, uint256 s)
+    function MessageCallTransaction(byte[] data, uint256 gasPrice, uint256 gasLimit, address to, uint256 value, uint8 v, uint256 r, uint256 s)
         Transaction(gasPrice, gasLimit, to, value, v, r, s) {
         _data = data;
     }

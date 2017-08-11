@@ -79,7 +79,7 @@ library Environment {
         uint256 gasLimit;      // A scalar value equal to the current limit of gas expenditure per block; formally H_l.
         uint256 gasUsed;       // A scalar value equal to the total gas used in transactions in this block; formally H_g.
         uint256 timestamp;     // A scalar value equal to the reasonable output of Unix’s time() at this block’s inception; formally H_s.
-        byte[]  extraData;     // An arbitrary byte array containing data relevant to this block. This must be 32 bytes or fewer; formally H_x.
+        bytes   extraData;     // An arbitrary byte array containing data relevant to this block. This must be 32 bytes or fewer; formally H_x.
         uint256 mixHash;       // A 256-bit hash which proves combined with the nonce that a sufficient amount of compu- tation has been carried out on this block; formally H_m.
         uint64  nonce;         // A 64-bit hash which proves combined with the mix-hash that a sufficient amount of compu- tation has been carried out on this block; formally H_n.
     }
@@ -91,6 +91,6 @@ library Environment {
     struct LogEntry {
         address loggersAddress;
         LogTopic[] topics;
-        bytes data;
+        byte[] data;
     }
 }

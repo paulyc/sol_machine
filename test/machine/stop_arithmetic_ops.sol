@@ -29,8 +29,7 @@ contract TestStopAndArithmeticOperationsMachine is EthereumABI {
 
     function testStop() {
         stackMachine = new StopAndArithmeticOperationsMachine();
-        bytes memory testCode = new bytes(1);
-        testCode[0] = OP_STOP;
+        byte[1] memory testCode = OP_STOP;
         stackMachine.push(1);
         stackMachine.push(2);
         stackMachine.execute(testCode);
@@ -41,8 +40,7 @@ contract TestStopAndArithmeticOperationsMachine is EthereumABI {
 
     function testAdd() {
         stackMachine = new StopAndArithmeticOperationsMachine();
-        bytes memory testCode = new bytes(1);
-        testCode[0] = OP_ADD;
+        byte[1] memory testCode = OP_ADD;
         stackMachine.push(1);
         stackMachine.push(2);
         stackMachine.execute(testCode);
@@ -53,8 +51,7 @@ contract TestStopAndArithmeticOperationsMachine is EthereumABI {
 
     function testSub() {
         stackMachine = new StopAndArithmeticOperationsMachine();
-        bytes memory testCode = new bytes(1);
-        testCode[0] = OP_SUB;
+        byte[1] memory testCode = OP_SUB;
         stackMachine.push(1);
         stackMachine.push(2);
         stackMachine.execute(testCode);
@@ -65,8 +62,7 @@ contract TestStopAndArithmeticOperationsMachine is EthereumABI {
 
     function testDiv() {
         stackMachine = new StopAndArithmeticOperationsMachine();
-        bytes memory testCode = new bytes(1);
-        testCode[0] = OP_DIV;
+        byte[1] memory testCode = OP_DIV;
         stackMachine.push(22);
         stackMachine.push(99);
         stackMachine.execute(testCode);
