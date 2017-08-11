@@ -25,13 +25,11 @@ pragma solidity ^0.4.15;
 import './transaction.sol';
 
 contract Block {
-    
-
-    Environment.BlockHeader _blockHeader;
-    Environment.BlockHeader[] _ommerBlockHeaders;
+    EvmSpec.BlockHeader _blockHeader;
+    EvmSpec.BlockHeader[] _ommerBlockHeaders;
     Transaction[] _transactions;
 
-    function Block(Environment.BlockHeader header, Environment.BlockHeader[] ommerBlockHeaders, Transaction[] transactions) {
+    function Block(EvmSpec.BlockHeader header, EvmSpec.BlockHeader[] ommerBlockHeaders, Transaction[] transactions) {
         _blockHeader = header;
         _ommerBlockHeaders = ommerBlockHeaders;
         _transactions = transactions;

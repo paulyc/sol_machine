@@ -22,7 +22,12 @@
 
 pragma solidity ^0.4.15;
 
-library Environment {
+// Adapted from the original "yellowpaper" specification,
+// which can be found in PDF form at http://yellowpaper.io/
+
+import './ethereum_abi.sol';
+
+contract EvmSpec is EthereumABI {
     struct SystemState {
         uint256[1024]               stack;
         uint256[]                   memory_;
@@ -48,14 +53,15 @@ library Environment {
     }
     
     struct ExecutionEnvironment {
-        address codeOwner;
-        address transactionOriginator;
-        uint256 gasPrice;
-        byte[] inputData; // if the execution agent is a transaction, this would be the transaction data
-        uint256 valuePassedWithExecution; // if the execution agent is a transaction, this would be the transaction value
-        byte[] machineCode;
-        uint256 blockHeader;
-        uint256 callOrCreateDepth; // the depth of the present message-call or contract-creation (i.e. the number of CALLs or CREATEs being executed at present)
+        address codeOwner;                  // I_a, the address of the account which owns the code that is executing
+        address transactionOriginator;      // I_o, the sender address of the transaction that originated this execution.
+        uint256 gasPrice;                   // I_p, the price of gas in the transaction that origi- nated this execution
+        byte[]  inputData;                  // I_d, the byte array that is the input data to this execution; if the execution agent is a transaction, this would be the transaction data
+        address executor;                   // I_s, the address of the account which caused the code to be executing; if the execution agent is a transaction, this would be the transaction sender
+        uint256 valuePassedWithExecution;   // I_v, the value, in Wei, passed to this account as part of the same procedure as execution; if the execution agent is a transaction, this would be the transaction value.
+        byte[]  machineCode;                // I_b, the byte array that is the machine code to be executed
+        uint256 blockHeader;                // I_H, the block header of the present block
+        uint256 callOrCreateDepth;          // I_e, the depth of the present message-call or contract-creation (i.e. the number of CALLs or CREATEs being executed at present)
     }
 
     struct AccountState {

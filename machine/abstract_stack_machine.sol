@@ -22,14 +22,14 @@
 
 pragma solidity ^0.4.15;
 
-import '../environment.sol';
+import '../ethereum_specification.sol';
 import '../stack_owner.sol';
 
 contract AbstractStackMachine is StackOwner {
     mapping(byte => function () internal returns (ExecutionStatus)) _operandDispatchTable;
 
-    Environment.WorldState _worldState;
-    Environment.MachineState _machineState;
+    EvmSpec.WorldState _worldState;
+    EvmSpec.MachineState _machineState;
     uint256 _gasAvailable;
     uint256 _programCounter;
 

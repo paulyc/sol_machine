@@ -37,7 +37,7 @@ contract EthereumABI {
     byte constant OP_MULMOD     = 0x09;
     byte constant OP_EXP        = 0x0a;
     byte constant OP_SIGNEXTEND = 0x0b;
-    
+
     // Comparison and Bitwise Logic Operations
     byte constant OP_LT     = 0x10;
     byte constant OP_GT     = 0x11;
@@ -50,10 +50,10 @@ contract EthereumABI {
     byte constant OP_XOR    = 0x18;
     byte constant OP_NOT    = 0x19;
     byte constant OP_BYTE   = 0x1a;
-    
+
     // SHA3
     byte constant OP_SHA3 = 0x20;
-    
+
     // Environmental Information
     byte constant OP_ADDRESS      = 0x30;
     byte constant OP_BALANCE      = 0x31;
@@ -68,7 +68,7 @@ contract EthereumABI {
     byte constant OP_GASPRICE     = 0x3a;
     byte constant OP_EXTCODESIZE  = 0x3b;
     byte constant OP_EXTCODECOPY  = 0x3c;
-    
+
     // Block Information
     byte constant OP_BLOCKHASH  = 0x50;
     byte constant OP_COINBASE   = 0x51;
@@ -76,7 +76,7 @@ contract EthereumABI {
     byte constant OP_NUMBER     = 0x53;
     byte constant OP_DIFFICULTY = 0x54;
     byte constant OP_GASLIMIT   = 0x55;
-    
+
     // Stack, Memory, Storage, and Flow Operations
     byte constant OP_POP      = 0x50;
     byte constant OP_MLOAD    = 0x51;
@@ -90,7 +90,7 @@ contract EthereumABI {
     byte constant OP_MSIZE    = 0x59;
     byte constant OP_GAS      = 0x5a;
     byte constant OP_JUMPDEST = 0x5b;
-    
+
     // Push Operations
     byte constant OP_PUSH1  = 0x60;
     byte constant OP_PUSH2  = 0x61;
@@ -124,7 +124,7 @@ contract EthereumABI {
     byte constant OP_PUSH30 = 0x7d;
     byte constant OP_PUSH31 = 0x7e;
     byte constant OP_PUSH32 = 0x7f;
-    
+
     // Duplication Operations
     byte constant OP_DUP1  = 0x80;
     byte constant OP_DUP2  = 0x81;
@@ -142,7 +142,7 @@ contract EthereumABI {
     byte constant OP_DUP14 = 0x8d;
     byte constant OP_DUP15 = 0x8e;
     byte constant OP_DUP16 = 0x8f;
-    
+
     // Exchange Operations
     byte constant OP_SWAP1  = 0x90;
     byte constant OP_SWAP2  = 0x91;
@@ -160,21 +160,21 @@ contract EthereumABI {
     byte constant OP_SWAP14 = 0x9d;
     byte constant OP_SWAP15 = 0x9e;
     byte constant OP_SWAP16 = 0x9f;
-    
+
     // Logging Operations
     byte constant OP_LOG0 = 0xa0;
     byte constant OP_LOG1 = 0xa1;
     byte constant OP_LOG2 = 0xa2;
     byte constant OP_LOG3 = 0xa3;
     byte constant OP_LOG4 = 0xa4;
-    
+
     // System Operations
     byte constant OP_CREATE       = 0xf0;
     byte constant OP_CALL         = 0xf1;
     byte constant OP_CALLCODE     = 0xf2;
     byte constant OP_RETURN       = 0xf3;
     byte constant OP_DELEGATECALL = 0xf4;
-    
+
     // Halt Execution, Mark for Deletion
     byte constant OP_SELFDESTRUCT = 0xff;
 }

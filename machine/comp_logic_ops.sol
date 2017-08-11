@@ -23,9 +23,9 @@
 pragma solidity ^0.4.15;
 
 import './abstract_stack_machine.sol';
-import '../ethereum_abi.sol';
+import '../ethereum_specification.sol';
 
-contract ComputationAndLogicalOperationsMachine is AbstractStackMachine, EthereumABI {
+contract ComputationAndLogicalOperationsMachine is AbstractStackMachine, EvmSpec {
 
     function ComputationAndLogicalOperationsMachine() AbstractStackMachine() {
 

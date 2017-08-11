@@ -22,7 +22,7 @@
 
 pragma solidity ^0.4.15;
 
-import './environment.sol';
+import './ethereum_specification.sol';
 import './logging.sol';
 
 /**
@@ -71,10 +71,10 @@ contract Transaction {
         _s = s;
     }
 
-    function execute(Environment.SystemState systemState, 
-                     uint256 remainingGas, 
-                     Environment.ExecutionEnvironment executionEnvironment) private
-                     returns (Environment.SystemState, uint256, AccruedSubstate, byte[]) {
+    function execute(EvmSpec.SystemState systemState,
+                     uint256 remainingGas,
+                     EvmSpec.ExecutionEnvironment executionEnvironment) private
+            returns (EvmSpec.SystemState, uint256, AccruedSubstate, byte[]) {
         AccruedSubstate storage accruedSubstate;
         byte[] storage output;
         return (systemState, remainingGas, accruedSubstate, output);
