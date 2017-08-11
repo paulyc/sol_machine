@@ -157,6 +157,10 @@ contract AbstractStackMachine is StackOwner {
             }
         }
     }
+
+    function isHalted() returns (bool) {
+        return _executionStatus == ExecutionStatus.HALTED;
+    }
 }
 
 contract EthereumStackMachine is AbstractStackMachine, EthereumABI {

@@ -26,18 +26,52 @@ import '../stack_machine.sol';
 
 contract TestStackMachine is EthereumABI {
     EthereumStackMachine stackMachine;
+
+    function testStop() {
+        stackMachine = new EthereumStackMachine();
+        bytes memory testCode = new bytes(1);
+        testCode[0] = OP_STOP;
+        stackMachine.push(1);
+        stackMachine.push(2);
+        stackMachine.execute(testCode);
+        require(stackMachine.pop() == 2);
+        require(stackMachine.size() == 1);
+        require(stackMachine.isHalted());
+    }
     
     function testAdd() {
+        stackMachine = new EthereumStackMachine();
         bytes memory testCode = new bytes(1);
         testCode[0] = OP_ADD;
         stackMachine.push(1);
         stackMachine.push(2);
         stackMachine.execute(testCode);
-        if (stackMachine.pop() != 3) {
-            assert(false);
-        }
-        if (!stackMachine.isEmpty()) {
-            assert(false);
-        }
+        require(stackMachine.pop() == 3);
+        require(stackMachine.isEmpty());
+        require(stackMachine.isHalted());
+    }
+
+    function testSub() {
+        stackMachine = new EthereumStackMachine();
+        bytes memory testCode = new bytes(1);
+        testCode[0] = OP_SUB;
+        stackMachine.push(1);
+        stackMachine.push(2);
+        stackMachine.execute(testCode);
+        require(stackMachine.pop() == 1);
+        require(stackMachine.isEmpty());
+        require(stackMachine.isHalted());
+    }
+
+    function testDiv() {
+        stackMachine = new EthereumStackMachine();
+        bytes memory testCode = new bytes(1);
+        testCode[0] = OP_DIV;
+        stackMachine.push(22);
+        stackMachine.push(99);
+        stackMachine.execute(testCode);
+        require(stackMachine.pop() == 4);
+        require(stackMachine.isEmpty());
+        require(stackMachine.isHalted());
     }
 }
