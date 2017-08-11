@@ -22,13 +22,6 @@
 
 pragma solidity ^0.4.15;
 
-import './abstract_stack_machine.sol';
-import '../ethereum_specification.sol';
-
-contract ComputationAndLogicalOperationsMachine is AbstractStackMachine {
-
-    function ComputationAndLogicalOperationsMachine() AbstractStackMachine() {
-
-    }
+library ComputationAndLogicalOperations {
 
 }

@@ -22,13 +22,19 @@
 
 pragma solidity ^0.4.15;
 
-import './ethereum_specification.sol';
-
 library Logging {
-
-    function bloomFilter(EvmSpec.LogEntry entry) internal returns (uint256) {
-        // stub return dummy value
-        return 0x1111111111111111111111111111111111111111111111111111111111111111;
+    struct LogEntry {
+        address loggersAddress;
+        byte[32][] topics;
+        byte[] data;
     }
 
+    function initBloomFilter() returns (bytes) {
+        return new bytes(256);
+    }
+
+    function updateBloomFilter(bytes filter, address loggersAddress, byte[32][] topics) returns (bytes) {
+        // stub return dummy value
+        return filter;
+    }
 }

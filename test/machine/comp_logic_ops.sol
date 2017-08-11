@@ -24,6 +24,6 @@ pragma solidity ^0.4.15;
 
 import '../../machine/comp_logic_ops.sol';
 
-contract TestComputationAndLogicalOperationsMachine is EthereumABI {
+contract TestComputationAndLogicalOperationsMachine {
 
 }

@@ -22,113 +22,102 @@
 
 pragma solidity ^0.4.15;
 
-import './abstract_stack_machine.sol';
-import '../ethereum_specification.sol';
+import './executor.sol';
 
-contract StopAndArithmeticOperationsMachine is AbstractStackMachine {
-    function StopAndArithmeticOperationsMachine() AbstractStackMachine() {
-        _operandDispatchTable[OP_STOP] = executeStop;
-        _operandDispatchTable[OP_ADD] = executeAdd;
-        _operandDispatchTable[OP_MUL] = executeMul;
-        _operandDispatchTable[OP_SUB] = executeSub;
-        _operandDispatchTable[OP_DIV] = executeDiv;
-        _operandDispatchTable[OP_SDIV] = executeSdiv;
-        _operandDispatchTable[OP_MOD] = executeMod;
-        _operandDispatchTable[OP_SMOD] = executeSmod;
-        _operandDispatchTable[OP_ADDMOD] = executeAddmod;
-        _operandDispatchTable[OP_MULMOD] = executeMulmod;
-        _operandDispatchTable[OP_EXP] = executeExp;
-        _operandDispatchTable[OP_SIGNEXTEND] = executeSignextend;
+contract StopAndArithmeticOperations {
+
+    function executeStop(ExecutionContext context) {
+        context.halt();
+        context.consumeGas(1);
     }
 
-    function executeStop() internal returns (EvmSpec.ExecutionStatus) {
-        return halt();
+    function executeAdd(ExecutionContext context)  {
+        EvmStack stack = context.getStack();
+        uint256 lhs = stack.pop();
+        stack.swapTop(lhs + stack.top());
+        context.consumeGas(1);
     }
 
-    function executeAdd() internal returns (EvmSpec.ExecutionStatus) {
-        uint256 lhs = _stack.pop();
-        _stack.swapTop(lhs + _stack.top());
-        return EvmSpec.ExecutionStatus.EXECUTING;
+    function executeMul(ExecutionContext context) {
+        EvmStack stack = context.getStack();
+        uint256 lhs = stack.pop();
+        stack.swapTop(lhs * stack.top());
+        context.consumeGas(1);
     }
 
-    function executeMul() internal returns (EvmSpec.ExecutionStatus) {
-        uint256 lhs = _stack.pop();
-        _stack.swapTop(lhs * _stack.top());
-        return EvmSpec.ExecutionStatus.EXECUTING;
+    function executeSub(ExecutionContext context) {
+        EvmStack stack = context.getStack();
+        uint256 lhs = stack.pop();
+        stack.swapTop(lhs - stack.top());
+        context.consumeGas(1);
     }
 
-    function executeSub() internal returns (EvmSpec.ExecutionStatus) {
-        uint256 lhs = _stack.pop();
-        _stack.swapTop(lhs - _stack.top());
-        return EvmSpec.ExecutionStatus.EXECUTING;
-    }
-
-    function executeDiv() internal returns (EvmSpec.ExecutionStatus) {
-        uint256 numerator = _stack.pop();
-        uint256 denominator = _stack.top();
+    function executeDiv(ExecutionContext context) {
+        EvmStack stack = context.getStack();
+        uint256 numerator = stack.pop();
+        uint256 denominator = stack.top();
         if (denominator == 0) {
-            _stack.swapTop(0);
+            stack.swapTop(0);
         } else {
-            _stack.swapTop(numerator / denominator);
+            stack.swapTop(numerator / denominator);
         }
-        return EvmSpec.ExecutionStatus.EXECUTING;
+        context.consumeGas(1);
     }
 
-    function executeSdiv() internal returns (EvmSpec.ExecutionStatus) {
-        int256 numerator = int256(_stack.pop());
-        int256 denominator = int256(_stack.top());
+    function executeSdiv(ExecutionContext context) {
+        EvmStack stack = context.getStack();
+        int256 numerator = int256(stack.pop());
+        int256 denominator = int256(stack.top());
         if (denominator == 0) {
-            _stack.swapTop(0);
+            stack.swapTop(0);
         } else if (numerator == 0x800000000000000000000000000000000000000000000000 && denominator == -1) {
             // If you were wondering, 0x800000000000000000000000000000000000000000000000 is binary 2's complement for -2^255
             // and although -2^255 / -1 = 2^255 in normal math, in signed 256-bit 2's complement, it overflows,
             // so the actual result here is -2^255. Don't ask me, I don't make the rules, I just implement them
-            _stack.swapTop(0x800000000000000000000000000000000000000000000000);
+            stack.swapTop(0x800000000000000000000000000000000000000000000000);
         } else {
-            _stack.swapTop(uint256(numerator / denominator));
+            stack.swapTop(uint256(numerator / denominator));
         }
-        return EvmSpec.ExecutionStatus.EXECUTING;
+        context.consumeGas(1);
     }
 
-    function executeMod() internal returns (EvmSpec.ExecutionStatus) {
-        uint256 numerator = _stack.pop();
-        uint256 denominator = _stack.top();
+    function executeMod(ExecutionContext context) {
+        EvmStack stack = context.getStack();
+        uint256 numerator = stack.pop();
+        uint256 denominator = stack.top();
         if (denominator == 0) {
-            _stack.swapTop(0);
+            stack.swapTop(0);
         } else {
-            _stack.swapTop(numerator % denominator);
+            stack.swapTop(numerator % denominator);
         }
-        return EvmSpec.ExecutionStatus.EXECUTING;
+        context.consumeGas(1);
     }
 
-    function executeSmod() internal returns (EvmSpec.ExecutionStatus) {
-        int256 numerator = int256(_stack.pop());
-        int256 denominator = int256(_stack.top());
+    function executeSmod(ExecutionContext context) {
+        EvmStack stack = context.getStack();
+        int256 numerator = int256(stack.pop());
+        int256 denominator = int256(stack.top());
         if (denominator == 0) {
-            _stack.swapTop(0);
+            stack.swapTop(0);
         } else {
-            _stack.swapTop(uint256(numerator % denominator));
+            stack.swapTop(uint256(numerator % denominator));
         }
-        return EvmSpec.ExecutionStatus.EXECUTING;
+        context.consumeGas(1);
     }
 
-    function executeAddmod() internal returns (EvmSpec.ExecutionStatus) {
+    function executeAddmod(ExecutionContext context) {
         // stubbed no-op
-        return EvmSpec.ExecutionStatus.EXECUTING;
     }
 
-    function executeMulmod() internal returns (EvmSpec.ExecutionStatus) {
+    function executeMulmod(ExecutionContext context) {
         // stubbed no-op
-        return EvmSpec.ExecutionStatus.EXECUTING;
     }
 
-    function executeExp() internal returns (EvmSpec.ExecutionStatus) {
+    function executeExp(ExecutionContext context) {
         // stubbed no-op
-        return EvmSpec.ExecutionStatus.EXECUTING;
     }
 
-    function executeSignextend() internal returns (EvmSpec.ExecutionStatus) {
+    function executeSignextend(ExecutionContext context) {
         // stubbed no-op
-        return EvmSpec.ExecutionStatus.EXECUTING;
     }
 }

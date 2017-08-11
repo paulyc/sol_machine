@@ -24,11 +24,11 @@ pragma solidity ^0.4.15;
 
 import '../../machine/stop_arithmetic_ops.sol';
 
-contract TestStopAndArithmeticOperationsMachine is EthereumABI {
-    StopAndArithmeticOperationsMachine stackMachine;
+contract TestStopAndArithmeticOperations {
+    StopAndArithmeticOperations stackMachine;
 
     function testStop() {
-        stackMachine = new StopAndArithmeticOperationsMachine();
+        stackMachine = new StopAndArithmeticOperations();
         byte[1] memory testCode = OP_STOP;
         stackMachine.push(1);
         stackMachine.push(2);
@@ -39,7 +39,7 @@ contract TestStopAndArithmeticOperationsMachine is EthereumABI {
     }
 
     function testAdd() {
-        stackMachine = new StopAndArithmeticOperationsMachine();
+        stackMachine = new StopAndArithmeticOperations();
         byte[1] memory testCode = OP_ADD;
         stackMachine.push(1);
         stackMachine.push(2);
@@ -50,7 +50,7 @@ contract TestStopAndArithmeticOperationsMachine is EthereumABI {
     }
 
     function testSub() {
-        stackMachine = new StopAndArithmeticOperationsMachine();
+        stackMachine = new StopAndArithmeticOperations();
         byte[1] memory testCode = OP_SUB;
         stackMachine.push(1);
         stackMachine.push(2);
@@ -61,7 +61,7 @@ contract TestStopAndArithmeticOperationsMachine is EthereumABI {
     }
 
     function testDiv() {
-        stackMachine = new StopAndArithmeticOperationsMachine();
+        stackMachine = new StopAndArithmeticOperations();
         byte[1] memory testCode = OP_DIV;
         stackMachine.push(22);
         stackMachine.push(99);
