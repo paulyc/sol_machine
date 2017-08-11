@@ -25,22 +25,12 @@ pragma solidity ^0.4.15;
 library Environment {
     struct SystemState {
         uint256[1024]               stack;
-        mapping(uint256 => uint256) storage_;
         uint256[]                   memory_;
+        mapping(uint256 => uint256) storage_;
         
         uint256 gasAvailable;
         uint256 programCounter;
         uint256 stackPointer;
-    }
-    
-    struct LogTopic {
-        byte[32] topic;
-    }
-    
-    struct LogEntry {
-        address loggersAddress;
-        LogTopic[] topics;
-        bytes data;
     }
     
     struct ExecutionState {
@@ -52,9 +42,9 @@ library Environment {
     }
     
     struct MachineState {
-        uint256[1024]               stack;
-        mapping(uint256 => uint256) storage_;
+        uint256[]                   stack;
         uint256[]                   memory_;
+        mapping(uint256 => uint256) storage_;
     }
     
     struct ExecutionEnvironment {
@@ -66,19 +56,5 @@ library Environment {
         byte[] machineCode;
         uint256 blockHeader;
         uint256 callOrCreateDepth; // the depth of the present message-call or contract-creation (i.e. the number of CALLs or CREATEs being executed at present)
-    }
-    
-    struct Refund {
-        
-    }
-    
-    struct Suicide {
-        
-    }
-    
-    struct AccruedSubstrate {
-        Suicide[] suicidesSet;
-        LogEntry[] logSeries;
-        Refund[] refunds;
     }
 }

@@ -23,170 +23,56 @@
 pragma solidity ^0.4.15;
 
 import './environment.sol';
+import '../ethereum_abi.sol';
 
-contract StackMachine {
+contract StackOwner {
+    uint256[1024] _stack;
+    uint256 _stackPointer; // offset of the invalid element on the very top of stack
+
+    function StackOwner() internal {
+        _stackPointer = 0;
+    }
+
+    function push(uint256 value) {
+        require(_stackPointer < _stack.length);
+        _stack[_stackPointer++] = value;
+    }
     
-    // Stop and Arithmetic Operations
-    byte constant OP_STOP       = 0x00;
-    byte constant OP_ADD        = 0x01;
-    byte constant OP_MUL        = 0x02;
-    byte constant OP_SUB        = 0x03;
-    byte constant OP_DIV        = 0x04;
-    byte constant OP_SDIV       = 0x05;
-    byte constant OP_MOD        = 0x06;
-    byte constant OP_SMOD       = 0x07;
-    byte constant OP_ADDMOD     = 0x08;
-    byte constant OP_MULMOD     = 0x09;
-    byte constant OP_EXP        = 0x0a;
-    byte constant OP_SIGNEXTEND = 0x0b;
+    function pop() returns (uint256) {
+        require(_stackPointer > 0);
+        return _stack[--_stackPointer];
+    }
     
-    // Comparison and Bitwise Logic Operations
-    byte constant OP_LT     = 0x10;
-    byte constant OP_GT     = 0x11;
-    byte constant OP_SLT    = 0x12;
-    byte constant OP_SGT    = 0x13;
-    byte constant OP_EQ     = 0x14;
-    byte constant OP_ISZERO = 0x15;
-    byte constant OP_AND    = 0x16;
-    byte constant OP_OR     = 0x17;
-    byte constant OP_XOR    = 0x18;
-    byte constant OP_NOT    = 0x19;
-    byte constant OP_BYTE   = 0x1a;
+    function top() returns (uint256) {
+        require(_stackPointer > 0);
+        return _stack[_stackPointer - 1];
+    }
     
-    // SHA3
-    byte constant OP_SHA3 = 0x20;
+    function isEmpty() returns (bool) {
+        return _stackPointer > 0;
+    }
     
-    // Environmental Information
-    byte constant OP_ADDRESS      = 0x30;
-    byte constant OP_BALANCE      = 0x31;
-    byte constant OP_ORIGIN       = 0x32;
-    byte constant OP_CALLER       = 0x33;
-    byte constant OP_CALLVALUE    = 0x34;
-    byte constant OP_CALLDATALOAD = 0x35;
-    byte constant OP_CALLDATASIZE = 0x36;
-    byte constant OP_CALLDATACOPY = 0x37;
-    byte constant OP_CODESIZE     = 0x38;
-    byte constant OP_CODECOPY     = 0x39;
-    byte constant OP_GASPRICE     = 0x3a;
-    byte constant OP_EXTCODESIZE  = 0x3b;
-    byte constant OP_EXTCODECOPY  = 0x3c;
-    
-    // Block Information
-    byte constant OP_BLOCKHASH  = 0x50;
-    byte constant OP_COINBASE   = 0x51;
-    byte constant OP_TIMESTAMP  = 0x52;
-    byte constant OP_NUMBER     = 0x53;
-    byte constant OP_DIFFICULTY = 0x54;
-    byte constant OP_GASLIMIT   = 0x55;
-    
-    // Stack, Memory, Storage, and Flow Operations
-    byte constant OP_POP      = 0x50;
-    byte constant OP_MLOAD    = 0x51;
-    byte constant OP_MSTORE   = 0x52;
-    byte constant OP_MSTORE8  = 0x53;
-    byte constant OP_SLOAD    = 0x54;
-    byte constant OP_SSTORE   = 0x55;
-    byte constant OP_JUMP     = 0x56;
-    byte constant OP_JUMPI    = 0x57;
-    byte constant OP_PC       = 0x58;
-    byte constant OP_MSIZE    = 0x59;
-    byte constant OP_GAS      = 0x5a;
-    byte constant OP_JUMPDEST = 0x5b;
-    
-    // Push Operations
-    byte constant OP_PUSH1  = 0x60;
-    byte constant OP_PUSH2  = 0x61;
-    byte constant OP_PUSH3  = 0x62;
-    byte constant OP_PUSH4  = 0x63;
-    byte constant OP_PUSH5  = 0x64;
-    byte constant OP_PUSH6  = 0x65;
-    byte constant OP_PUSH7  = 0x66;
-    byte constant OP_PUSH8  = 0x67;
-    byte constant OP_PUSH9  = 0x68;
-    byte constant OP_PUSH10 = 0x69;
-    byte constant OP_PUSH11 = 0x6a;
-    byte constant OP_PUSH12 = 0x6b;
-    byte constant OP_PUSH13 = 0x6c;
-    byte constant OP_PUSH14 = 0x6d;
-    byte constant OP_PUSH15 = 0x6e;
-    byte constant OP_PUSH16 = 0x6f;
-    byte constant OP_PUSH17 = 0x70;
-    byte constant OP_PUSH18 = 0x71;
-    byte constant OP_PUSH19 = 0x72;
-    byte constant OP_PUSH20 = 0x73;
-    byte constant OP_PUSH21 = 0x74;
-    byte constant OP_PUSH22 = 0x75;
-    byte constant OP_PUSH23 = 0x76;
-    byte constant OP_PUSH24 = 0x77;
-    byte constant OP_PUSH25 = 0x78;
-    byte constant OP_PUSH26 = 0x79;
-    byte constant OP_PUSH27 = 0x7a;
-    byte constant OP_PUSH28 = 0x7b;
-    byte constant OP_PUSH29 = 0x7c;
-    byte constant OP_PUSH30 = 0x7d;
-    byte constant OP_PUSH31 = 0x7e;
-    byte constant OP_PUSH32 = 0x7f;
-    
-    // Duplication Operations
-    byte constant OP_DUP1  = 0x80;
-    byte constant OP_DUP2  = 0x81;
-    byte constant OP_DUP3  = 0x82;
-    byte constant OP_DUP4  = 0x83;
-    byte constant OP_DUP5  = 0x84;
-    byte constant OP_DUP6  = 0x85;
-    byte constant OP_DUP7  = 0x86;
-    byte constant OP_DUP8  = 0x87;
-    byte constant OP_DUP9  = 0x88;
-    byte constant OP_DUP10 = 0x89;
-    byte constant OP_DUP11 = 0x8a;
-    byte constant OP_DUP12 = 0x8b;
-    byte constant OP_DUP13 = 0x8c;
-    byte constant OP_DUP14 = 0x8d;
-    byte constant OP_DUP15 = 0x8e;
-    byte constant OP_DUP16 = 0x8f;
-    
-    // Exchange Operations
-    byte constant OP_SWAP1  = 0x90;
-    byte constant OP_SWAP2  = 0x91;
-    byte constant OP_SWAP3  = 0x92;
-    byte constant OP_SWAP4  = 0x93;
-    byte constant OP_SWAP5  = 0x94;
-    byte constant OP_SWAP6  = 0x95;
-    byte constant OP_SWAP7  = 0x96;
-    byte constant OP_SWAP8  = 0x97;
-    byte constant OP_SWAP9  = 0x98;
-    byte constant OP_SWAP10 = 0x99;
-    byte constant OP_SWAP11 = 0x9a;
-    byte constant OP_SWAP12 = 0x9b;
-    byte constant OP_SWAP13 = 0x9c;
-    byte constant OP_SWAP14 = 0x9d;
-    byte constant OP_SWAP15 = 0x9e;
-    byte constant OP_SWAP16 = 0x9f;
-    
-    // Logging Operations
-    byte constant OP_LOG0 = 0xa0;
-    byte constant OP_LOG1 = 0xa1;
-    byte constant OP_LOG2 = 0xa2;
-    byte constant OP_LOG3 = 0xa3;
-    byte constant OP_LOG4 = 0xa4;
-    
-    // System Operations
-    byte constant OP_CREATE       = 0xf0;
-    byte constant OP_CALL         = 0xf1;
-    byte constant OP_CALLCODE     = 0xf2;
-    byte constant OP_RETURN       = 0xf3;
-    byte constant OP_DELEGATECALL = 0xf4;
-    
-    // Halt Execution, Mark for Deletion
-    byte constant OP_SELFDESTRUCT = 0xff;
-    
-    mapping(byte => function () internal returns (ExecutionStatus)) _operandDispatchTable;
+    function stackOffset(uint256 offset) returns (uint256) {
+        // this should probably be a debugging only facility
+        require(_stackPointer > 0 &&
+                _stackPointer >= (offset + 1) &&
+                _stackPointer - (offset + 1) < _stack.length);
+        return _stack[_stackPointer - (offset + 1)];
+    }
+}
+
+contract AbstractStackMachine is StackOwner {
+    mapping(byte => function () internal
+        returns (AbstractStackMachine.ExecutionStatus)) _operandDispatchTable;
     
     Environment.MachineState _machineState;
     uint256 _gasAvailable;
     uint256 _programCounter;
-    uint256 _stackPointer; // offset of the invalid element on the very top of stack
 
+    function AbstractStackMachine() StackOwner() {
+        _machineState.stack = _stack; // may not even be necessary
+        _programCounter = 0;
+    }
     
     enum ExecutionStatus {
         PRE_EXECUTION,
@@ -204,54 +90,33 @@ contract StackMachine {
     
     function executeAdd() internal returns (ExecutionStatus) {
         --_stackPointer;
-        _machineState.stack[_stackPointer] += _machineState.stack[_stackPointer - 1];
-        ++_programCounter;
+        _stack[_stackPointer] += _stack[_stackPointer - 1];
         return ExecutionStatus.EXECUTING;
     }
     
     function executeMul() internal returns (ExecutionStatus) {
         --_stackPointer;
-        _machineState.stack[_stackPointer] *= _machineState.stack[_stackPointer - 1];
-        ++_programCounter;
+        _stack[_stackPointer] *= _stack[_stackPointer - 1];
         return ExecutionStatus.EXECUTING;
     }
     
-    function push(uint256 value) {
-        _machineState.stack[_stackPointer++] = value;
+    function executeSub() internal returns (ExecutionStatus) {
+        --_stackPointer;
+        _stack[_stackPointer] -= _stack[_stackPointer - 1];
+        return ExecutionStatus.EXECUTING;
     }
-    
-    function pop() returns (uint256) {
-        return _machineState.stack[--_stackPointer];
+
+    function executeDiv() internal returns (ExecutionStatus) {
+        --_stackPointer;
+        _stack[_stackPointer] /= _stack[_stackPointer - 1];
+        return ExecutionStatus.EXECUTING;
     }
-    
-    function stackOffset(uint256 offset) returns (uint256) {
-        // this should be a debugging only facility
-        if (_stackPointer == 0 || _stackPointer < (offset + 1)) {
-            // You're trying to access an invalid element either off the top or bottom of the stack
-            revert();
-        }
-        return _machineState.stack[_stackPointer - (offset + 1)];
-    }
-    
-    function StackMachine() {
-        _programCounter = 0;
-        _stackPointer = 0;
-        
-        _operandDispatchTable[OP_STOP] = executeStop;
-        _operandDispatchTable[OP_ADD] = executeAdd;
-        _operandDispatchTable[OP_ADD] = executeMul;
-    }
-    
-    struct PostInstructionState {
-        
-    }
-    
+
     function execute(bytes program) {
         ExecutionStatus executionStatus = ExecutionStatus.EXECUTING;
-        uint programCounterOffset;
         
         while (_programCounter < program.length) {
-            byte operand = program[_programCounter];
+            byte operand = program[_programCounter++];
             
             (executionStatus) = _operandDispatchTable[operand]();
             
@@ -260,5 +125,19 @@ contract StackMachine {
                 break;
             }
         }
+    }
+}
+
+contract EthereumStackMachine is AbstractStackMachine, EthereumABI {
+    function EthereumStackMachine() AbstractStackMachine() {
+        _operandDispatchTable[OP_STOP] = executeStop;
+        _operandDispatchTable[OP_ADD] = executeAdd;
+        _operandDispatchTable[OP_MUL] = executeMul;
+        _operandDispatchTable[OP_SUB] = executeSub;
+        _operandDispatchTable[OP_DIV] = executeDiv;
+    }
+    
+    struct PostInstructionState {
+        
     }
 }

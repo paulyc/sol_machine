@@ -25,6 +25,29 @@ pragma solidity ^0.4.15;
 import './stack_machine.sol';
 
 contract Transaction {
+    struct LogTopic {
+        byte[32] topic;
+    }
+    
+    struct LogEntry {
+        address loggersAddress;
+        LogTopic[] topics;
+        bytes data;
+    }
+    
+    struct Refund {
+        
+    }
+    
+    struct Suicide {
+        
+    }
+    
+    struct AccruedSubstrate {
+        Suicide[] suicidesSet;
+        LogEntry[] logSeries;
+        Refund[] refunds;
+    }
     
     function Transaction() {
         
@@ -33,8 +56,8 @@ contract Transaction {
     function execute(Environment.SystemState systemState, 
                      uint256 remainingGas, 
                      Environment.ExecutionEnvironment executionEnvironment) private
-                     returns (Environment.SystemState, uint256, Environment.AccruedSubstrate, bytes) {
-        Environment.AccruedSubstrate storage accruedSubstate;
+                     returns (Environment.SystemState, uint256, AccruedSubstrate, bytes) {
+        AccruedSubstrate storage accruedSubstate;
         bytes storage output;
         return (systemState, remainingGas, accruedSubstate, output);
     }
