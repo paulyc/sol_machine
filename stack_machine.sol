@@ -23,63 +23,29 @@
 pragma solidity ^0.4.15;
 
 import './environment.sol';
-import '../ethereum_abi.sol';
-
-contract StackOwner {
-    uint256[1024] _stack;
-    uint256 _stackPointer; // offset of the invalid element on the very top of stack
-
-    function StackOwner() internal {
-        _stackPointer = 0;
-    }
-
-    function push(uint256 value) {
-        require(_stackPointer < _stack.length);
-        _stack[_stackPointer++] = value;
-    }
-    
-    function pop() returns (uint256) {
-        require(_stackPointer > 0);
-        return _stack[--_stackPointer];
-    }
-    
-    function top() returns (uint256) {
-        require(_stackPointer > 0);
-        return _stack[_stackPointer - 1];
-    }
-    
-    function isEmpty() returns (bool) {
-        return _stackPointer > 0;
-    }
-    
-    function stackOffset(uint256 offset) returns (uint256) {
-        // this should probably be a debugging only facility
-        require(_stackPointer > 0 &&
-                _stackPointer >= (offset + 1) &&
-                _stackPointer - (offset + 1) < _stack.length);
-        return _stack[_stackPointer - (offset + 1)];
-    }
-}
+import './ethereum_abi.sol';
+import './stack_owner.sol';
 
 contract AbstractStackMachine is StackOwner {
-    mapping(byte => function () internal
-        returns (AbstractStackMachine.ExecutionStatus)) _operandDispatchTable;
+    mapping(byte => function () internal returns (ExecutionStatus)) _operandDispatchTable;
     
     Environment.MachineState _machineState;
     uint256 _gasAvailable;
     uint256 _programCounter;
 
-    function AbstractStackMachine() StackOwner() {
-        _machineState.stack = _stack; // may not even be necessary
-        _programCounter = 0;
-    }
-    
     enum ExecutionStatus {
         PRE_EXECUTION,
         EXECUTING,
         HALTED
     }
-    
+    ExecutionStatus _executionStatus;
+
+    function AbstractStackMachine() StackOwner(1024) {
+        _machineState.stack = _stack; // may not even be necessary
+        _programCounter = 0;
+        _executionStatus = ExecutionStatus.PRE_EXECUTION;
+    }
+
     function halt() internal returns (ExecutionStatus) {
         return ExecutionStatus.HALTED;
     }
@@ -108,19 +74,84 @@ contract AbstractStackMachine is StackOwner {
 
     function executeDiv() internal returns (ExecutionStatus) {
         --_stackPointer;
-        _stack[_stackPointer] /= _stack[_stackPointer - 1];
+        uint256 denominator = _stack[_stackPointer - 1];
+        if (denominator == 0) {
+            _stack[_stackPointer] = 0;
+        } else {
+            _stack[_stackPointer] /= denominator;
+        }
+        return ExecutionStatus.EXECUTING;
+    }
+
+    function executeSdiv() internal returns (ExecutionStatus) {
+        --_stackPointer;
+        int256 numerator = int256(_stack[_stackPointer]);
+        int256 denominator = int256(_stack[_stackPointer - 1]);
+        if (denominator == 0) {
+            _stack[_stackPointer] = 0;
+        } else if (numerator == 0x800000000000000000000000000000000000000000000000 && denominator == -1) {
+            // If you were wondering, 0x800000000000000000000000000000000000000000000000 is binary 2's complement for -2^255
+            // and although -2^255 / -1 = 2^255 in normal math, in signed 256-bit 2's complement, it overflows,
+            // so the actual result here is -2^255. Don't ask me, I don't make the rules, I just implement them
+            _stack[_stackPointer] = 0x800000000000000000000000000000000000000000000000;
+        } else {
+            _stack[_stackPointer] = uint256(numerator / denominator);
+        }
+        return ExecutionStatus.EXECUTING;
+    }
+
+    function executeMod() internal returns (ExecutionStatus) {
+        --_stackPointer;
+        uint256 denominator = _stack[_stackPointer - 1];
+        if (denominator == 0) {
+            _stack[_stackPointer] = 0;
+        } else {
+            _stack[_stackPointer] %= denominator;
+        }
+        return ExecutionStatus.EXECUTING;
+    }
+
+    function executeSmod() internal returns (ExecutionStatus) {
+        --_stackPointer;
+        int256 numerator = int256(_stack[_stackPointer]);
+        int256 denominator = int256(_stack[_stackPointer - 1]);
+        if (denominator == 0) {
+            _stack[_stackPointer] = 0;
+        } else {
+            _stack[_stackPointer] = uint256(numerator % denominator);
+        }
+        return ExecutionStatus.EXECUTING;
+    }
+
+    function executeAddmod() internal returns (ExecutionStatus) {
+        // stubbed no-op
+        return ExecutionStatus.EXECUTING;
+    }
+
+    function executeMulmod() internal returns (ExecutionStatus) {
+        // stubbed no-op
+        return ExecutionStatus.EXECUTING;
+    }
+
+    function executeExp() internal returns (ExecutionStatus) {
+        // stubbed no-op
+        return ExecutionStatus.EXECUTING;
+    }
+
+    function executeSignextend() internal returns (ExecutionStatus) {
+        // stubbed no-op
         return ExecutionStatus.EXECUTING;
     }
 
     function execute(bytes program) {
-        ExecutionStatus executionStatus = ExecutionStatus.EXECUTING;
+        _executionStatus = ExecutionStatus.EXECUTING;
         
         while (_programCounter < program.length) {
             byte operand = program[_programCounter++];
             
-            (executionStatus) = _operandDispatchTable[operand]();
+            (_executionStatus) = _operandDispatchTable[operand]();
             
-            if (executionStatus == ExecutionStatus.HALTED) {
+            if (_executionStatus == ExecutionStatus.HALTED) {
                 // we are done
                 break;
             }
@@ -135,6 +166,13 @@ contract EthereumStackMachine is AbstractStackMachine, EthereumABI {
         _operandDispatchTable[OP_MUL] = executeMul;
         _operandDispatchTable[OP_SUB] = executeSub;
         _operandDispatchTable[OP_DIV] = executeDiv;
+        _operandDispatchTable[OP_SDIV] = executeSdiv;
+        _operandDispatchTable[OP_MOD] = executeMod;
+        _operandDispatchTable[OP_SMOD] = executeSmod;
+        _operandDispatchTable[OP_ADDMOD] = executeAddmod;
+        _operandDispatchTable[OP_MULMOD] = executeMulmod;
+        _operandDispatchTable[OP_EXP] = executeExp;
+        _operandDispatchTable[OP_SIGNEXTEND] = executeSignextend;
     }
     
     struct PostInstructionState {
