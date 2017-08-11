@@ -24,6 +24,8 @@ pragma solidity ^0.4.15;
 
 import '../evm_stack.sol';
 
+// Hoping this will all end up with no reentrancy issues, that was the goal anyway....
+
 interface MachineCodeExecutor {
     function dispatch(byte opCode, ExecutionContext context);
 }
