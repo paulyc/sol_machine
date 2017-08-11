@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Workspace
+   version = "1.0">
+   <FileRef
+      location = "group:stack_machine.sol">
+   </FileRef>
+   <FileRef
+      location = "group:ethereum_abi.sol">
+   </FileRef>
+   <FileRef
+      location = "group:test">
+   </FileRef>
+   <FileRef
+      location = "group:transaction.sol">
+   </FileRef>
+   <FileRef
+      location = "group:environment.sol">
+   </FileRef>
+   <FileRef
+      location = "group:LICENSE">
+   </FileRef>
+   <FileRef
+      location = "group:README.md">
+   </FileRef>
+</Workspace>
