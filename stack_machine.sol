@@ -22,6 +22,8 @@
 
 pragma solidity ^0.4.15;
 
+import './environment.sol';
+
 contract StackMachine {
     
     // Stop and Arithmetic Operations
@@ -178,25 +180,84 @@ contract StackMachine {
     // Halt Execution, Mark for Deletion
     byte constant OP_SELFDESTRUCT = 0xff;
     
-    uint256[1024] _stack;
-    mapping(uint256 => uint256) _storage;
-    uint256[] _memory;
+    mapping(byte => function () internal returns (ExecutionStatus)) _operandDispatchTable;
+    
+    Environment.MachineState _machineState;
+    uint256 _gasAvailable;
     uint256 _programCounter;
+    uint256 _stackPointer; // offset of the invalid element on the very top of stack
+
+    
+    enum ExecutionStatus {
+        PRE_EXECUTION,
+        EXECUTING,
+        HALTED
+    }
+    
+    function halt() internal returns (ExecutionStatus) {
+        return ExecutionStatus.HALTED;
+    }
+    
+    function executeStop() internal returns (ExecutionStatus) {
+        return halt();
+    }
+    
+    function executeAdd() internal returns (ExecutionStatus) {
+        --_stackPointer;
+        _machineState.stack[_stackPointer] += _machineState.stack[_stackPointer - 1];
+        ++_programCounter;
+        return ExecutionStatus.EXECUTING;
+    }
+    
+    function executeMul() internal returns (ExecutionStatus) {
+        --_stackPointer;
+        _machineState.stack[_stackPointer] *= _machineState.stack[_stackPointer - 1];
+        ++_programCounter;
+        return ExecutionStatus.EXECUTING;
+    }
+    
+    function push(uint256 value) {
+        _machineState.stack[_stackPointer++] = value;
+    }
+    
+    function pop() returns (uint256) {
+        return _machineState.stack[--_stackPointer];
+    }
+    
+    function stackOffset(uint256 offset) returns (uint256) {
+        // this should be a debugging only facility
+        if (_stackPointer == 0 || _stackPointer < (offset + 1)) {
+            // You're trying to access an invalid element either off the top or bottom of the stack
+            revert();
+        }
+        return _machineState.stack[_stackPointer - (offset + 1)];
+    }
     
     function StackMachine() {
         _programCounter = 0;
+        _stackPointer = 0;
+        
+        _operandDispatchTable[OP_STOP] = executeStop;
+        _operandDispatchTable[OP_ADD] = executeAdd;
+        _operandDispatchTable[OP_ADD] = executeMul;
+    }
+    
+    struct PostInstructionState {
+        
     }
     
     function execute(bytes program) {
-        uint256 indx = 0;
-        while (indx < program.length) {
-            byte operand = program[indx];
-            if (operand == OP_STOP) {
-                
-            } else if (operand == OP_ADD) {
-                
-            } else {
-                
+        ExecutionStatus executionStatus = ExecutionStatus.EXECUTING;
+        uint programCounterOffset;
+        
+        while (_programCounter < program.length) {
+            byte operand = program[_programCounter];
+            
+            (executionStatus) = _operandDispatchTable[operand]();
+            
+            if (executionStatus == ExecutionStatus.HALTED) {
+                // we are done
+                break;
             }
         }
     }
