@@ -29,6 +29,7 @@ import './stack_owner.sol';
 contract AbstractStackMachine is StackOwner {
     mapping(byte => function () internal returns (ExecutionStatus)) _operandDispatchTable;
     
+    Environment.WorldState _worldState;
     Environment.MachineState _machineState;
     uint256 _gasAvailable;
     uint256 _programCounter;
@@ -56,19 +57,19 @@ contract AbstractStackMachine is StackOwner {
     
     function executeAdd() internal returns (ExecutionStatus) {
         uint256 lhs = pop();
-        setTop(lhs + top());
+        swapTop(lhs + top());
         return ExecutionStatus.EXECUTING;
     }
     
     function executeMul() internal returns (ExecutionStatus) {
         uint256 lhs = pop();
-        setTop(lhs * top());
+        swapTop(lhs * top());
         return ExecutionStatus.EXECUTING;
     }
     
     function executeSub() internal returns (ExecutionStatus) {
         uint256 lhs = pop();
-        setTop(lhs - top());
+        swapTop(lhs - top());
         return ExecutionStatus.EXECUTING;
     }
 
@@ -76,9 +77,9 @@ contract AbstractStackMachine is StackOwner {
         uint256 numerator = pop();
         uint256 denominator = top();
         if (denominator == 0) {
-            setTop(0);
+            swapTop(0);
         } else {
-            setTop(numerator / denominator);
+            swapTop(numerator / denominator);
         }
         return ExecutionStatus.EXECUTING;
     }
@@ -87,14 +88,14 @@ contract AbstractStackMachine is StackOwner {
         int256 numerator = int256(pop());
         int256 denominator = int256(top());
         if (denominator == 0) {
-            setTop(0);
+            swapTop(0);
         } else if (numerator == 0x800000000000000000000000000000000000000000000000 && denominator == -1) {
             // If you were wondering, 0x800000000000000000000000000000000000000000000000 is binary 2's complement for -2^255
             // and although -2^255 / -1 = 2^255 in normal math, in signed 256-bit 2's complement, it overflows,
             // so the actual result here is -2^255. Don't ask me, I don't make the rules, I just implement them
-            setTop(0x800000000000000000000000000000000000000000000000);
+            swapTop(0x800000000000000000000000000000000000000000000000);
         } else {
-            setTop(uint256(numerator / denominator));
+            swapTop(uint256(numerator / denominator));
         }
         return ExecutionStatus.EXECUTING;
     }
@@ -103,9 +104,9 @@ contract AbstractStackMachine is StackOwner {
         uint256 numerator = pop();
         uint256 denominator = top();
         if (denominator == 0) {
-            setTop(0);
+            swapTop(0);
         } else {
-            setTop(numerator % denominator);
+            swapTop(numerator % denominator);
         }
         return ExecutionStatus.EXECUTING;
     }
@@ -114,9 +115,9 @@ contract AbstractStackMachine is StackOwner {
         int256 numerator = int256(pop());
         int256 denominator = int256(top());
         if (denominator == 0) {
-            setTop(0);
+            swapTop(0);
         } else {
-            setTop(uint256(numerator % denominator));
+            swapTop(uint256(numerator % denominator));
         }
         return ExecutionStatus.EXECUTING;
     }

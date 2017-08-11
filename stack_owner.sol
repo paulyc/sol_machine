@@ -26,7 +26,7 @@ contract StackOwner {
     uint256[] _stack;
     uint256 _stackPointer; // offset of the invalid element on the very top of stack
 
-    function StackOwner(uint256 stackSize) internal {
+    function StackOwner(uint256 stackSize) {
         _stack.length = stackSize;
         _stackPointer = 0;
     }
@@ -60,16 +60,17 @@ contract StackOwner {
 
     function stackOffset(uint256 offset) returns (uint256) {
         // this should probably be a debugging only facility
-        require(_stackPointer > 0 &&
-            _stackPointer >= (offset + 1) &&
-            _stackPointer - (offset + 1) < _stack.length);
+        require(_stackPointer > 0 && // must have at least one item on the stack
+                _stackPointer >= (offset + 1) && // and be out of neither the lower bound
+                _stackPointer - (offset + 1) < _stack.length); // nor the upper bound of the stack
         return _stack[_stackPointer - (offset + 1)];
     }
 
-    function setTop(uint256 value) returns (uint256) {
-        require(_stackPointer > 0);
-        uint256 top = top();
-        _stack[_stackPointer - 1] = value;
-        return top;
+    function swapTop(uint256 value) returns (uint256) {
+        require(_stackPointer > 0); // must have at least one item on the stack to have a top to swap
+        _stack[_stackPointer - 1] ^= value;
+        value ^= _stack[_stackPointer - 1];
+        _stack[_stackPointer - 1] ^= value;
+        return value;
     }
 }

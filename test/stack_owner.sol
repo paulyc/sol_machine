@@ -66,12 +66,12 @@ contract TestStackOwner {
         require(ownerUnderTest.capacity() == 1024);
     }
 
-    function testSetTop() {
+    function testSwapTop() {
         ownerUnderTest = new StackOwner(1024);
         ownerUnderTest.push(1);
         ownerUnderTest.push(2);
         ownerUnderTest.push(3);
-        require(ownerUnderTest.setTop(4) == 3);
+        require(ownerUnderTest.swapTop(4) == 3);
         require(ownerUnderTest.top() == 4);
         require(ownerUnderTest.size() == 3);
         require(ownerUnderTest.pop() == 4);
