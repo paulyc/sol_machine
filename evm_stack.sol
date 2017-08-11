@@ -22,7 +22,7 @@
 
 pragma solidity ^0.4.15;
 
-// rename this
+// rename this file
 contract EvmStack {
     uint256[1024] _stack;
     uint256       _stackPointer; // offset of the invalid element on the very top of stack

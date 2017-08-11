@@ -24,6 +24,7 @@ pragma solidity ^0.4.15;
 
 import './abstract_stack_machine.sol';
 import '../ethereum_specification.sol';
+import '../evm_stack.sol';
 
 contract StopAndArithmeticOperationsMachine is AbstractStackMachine {
     function StopAndArithmeticOperationsMachine() AbstractStackMachine() {
@@ -42,29 +43,29 @@ contract StopAndArithmeticOperationsMachine is AbstractStackMachine {
     }
 
     function executeStop(ExecutionContext context) internal {
-        halt(context);
+        context.halt();
     }
 
     function executeAdd(ExecutionContext context) internal {
-        EvmStack stack = context._state._stack;
+        EvmStack stack = context.getStack();
         uint256 lhs = stack.pop();
         stack.swapTop(lhs + stack.top());
     }
 
     function executeMul(ExecutionContext context) internal {
-        EvmStack stack = context._state._stack;
+        EvmStack stack = context.getStack();
         uint256 lhs = stack.pop();
         stack.swapTop(lhs * stack.top());
     }
 
     function executeSub(ExecutionContext context) internal {
-        EvmStack stack = context._state._stack;
+        EvmStack stack = context.getStack();
         uint256 lhs = stack.pop();
         stack.swapTop(lhs - stack.top());
     }
 
     function executeDiv(ExecutionContext context) internal {
-        EvmStack stack = context._state._stack;
+        EvmStack stack = context.getStack();
         uint256 numerator = stack.pop();
         uint256 denominator = stack.top();
         if (denominator == 0) {
@@ -75,7 +76,7 @@ contract StopAndArithmeticOperationsMachine is AbstractStackMachine {
     }
 
     function executeSdiv(ExecutionContext context) internal {
-        EvmStack stack = context._state._stack;
+        EvmStack stack = context.getStack();
         int256 numerator = int256(stack.pop());
         int256 denominator = int256(stack.top());
         if (denominator == 0) {
@@ -91,7 +92,7 @@ contract StopAndArithmeticOperationsMachine is AbstractStackMachine {
     }
 
     function executeMod(ExecutionContext context) internal {
-        EvmStack stack = context._state._stack;
+        EvmStack stack = context.getStack();
         uint256 numerator = stack.pop();
         uint256 denominator = stack.top();
         if (denominator == 0) {
@@ -102,7 +103,7 @@ contract StopAndArithmeticOperationsMachine is AbstractStackMachine {
     }
 
     function executeSmod(ExecutionContext context) internal {
-        EvmStack stack = context._state._stack;
+        EvmStack stack = context.getStack();
         int256 numerator = int256(stack.pop());
         int256 denominator = int256(stack.top());
         if (denominator == 0) {

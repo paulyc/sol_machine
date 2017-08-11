@@ -26,7 +26,7 @@ import './ethereum_specification.sol';
 
 library Logging {
 
-    function bloomFilter(EvmSpec.LogEntry entry) internal returns (uint256) {
+    function bloomFilter(EvmSpec.LogEntry[] entries) internal returns (uint256) {
         // stub return dummy value
         return 0x1111111111111111111111111111111111111111111111111111111111111111;
     }

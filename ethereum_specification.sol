@@ -25,9 +25,9 @@ pragma solidity ^0.4.15;
 // Adapted from the original "yellowpaper" specification,
 // which can be found in PDF form at http://yellowpaper.io/
 
-import './stack_owner.sol';
+import './evm_stack.sol';
 
-library EvmSpec {
+contract EvmSpec {
     enum ExecutionStatus {
         PRE_EXECUTION,
         EXECUTING,
@@ -43,6 +43,7 @@ library EvmSpec {
         uint256 programCounter;
 
         ExecutionStatus status;
+        byte[] executingCode;
     }
     
     struct ExecutionEnvironment {
@@ -110,10 +111,13 @@ library EvmSpec {
         address[] selfDestructSet;
         LogEntry[] logSeries;
         uint256 refundBalance;
+        uint256 gasConsumed;
     }
 
     struct TransactionReceipt {
         SystemState postTransactionState;
         uint256 gasConsumed;
+        LogEntry[] logSeries;
+        uint256 bloomFilter;
     }
 }

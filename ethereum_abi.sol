@@ -23,8 +23,6 @@
 pragma solidity ^0.4.15;
 
 contract EthereumABI {
-    function execute(byte[] program);
-
     // Opcodes
     // Stop and Arithmetic Operations
     byte constant OP_STOP       = 0x00;

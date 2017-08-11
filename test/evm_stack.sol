@@ -22,7 +22,7 @@
 
 pragma solidity ^0.4.15;
 
-import '../stack_owner.sol';
+import '../evm_stack.sol';
 
 contract TestEvmStack {
     EvmStack stackUnderTest;

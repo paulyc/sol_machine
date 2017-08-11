@@ -33,13 +33,9 @@ and dissemination1. There are two types of transactions: those which result in m
 calls and those which result in the creation of new accounts with associated code (known
 informally as ‘contract creation’)
 */
-contract Transaction {
-    //struct Receipt {
-    //    EvmSpec.SystemState postTransactionState;
-    //    uint256 gasConsumed;
-   // }
+contract Transaction is EvmSpec {
 
-    EvmSpec.TransactionData _txdata;
+    TransactionData _txdata;
 
     function Transaction(uint256 gasPrice, uint256 gasLimit, address to, uint256 value, uint8 v, uint256 r, uint256 s, byte[] initOrInput) {
         _txdata.nonce = 0;
@@ -54,12 +50,7 @@ contract Transaction {
     }
 
     function execute(EthereumStackMachine virtualMachine, uint256 preRemainingGas) internal
-        returns (uint256 postRemainingGas, EvmSpec.TransactionSubstate, byte[] output);
-
-    /**function execute(EvmSpec.SystemState systemState,
-                     uint256 remainingGas,
-                     EvmSpec.ExecutionEnvironment executionEnvironment)
-            returns (uint256, EvmSpec.AccruedTransactionSubstate, byte[]);*/
+        returns (uint256 postRemainingGas, TransactionSubstate, byte[] output);
     
     function verifyTransaction() {
         /**
@@ -82,28 +73,14 @@ contract ContractCreationTransaction is Transaction {
         Transaction(gasPrice, gasLimit, to, value, v, r, s, init) {
     }
 
-EvmSpec.TransactionSubstate substate;
+    TransactionSubstate substate;
 
     function execute(EthereumStackMachine virtualMachine, uint256 remainingGas) internal
-    returns (uint256 newRemainingGas, EvmSpec.TransactionSubstate, byte[] output)  {
-        EvmSpec.TransactionSubstate storage substate;
+            returns (uint256 newRemainingGas, TransactionSubstate, byte[] output)  {
         ExecutionContext context = virtualMachine.getContext();
-        //EvmSpec.TransactionReceipt memory receipt = context.executeTransactionCode(_txdata.initOrInput);
         context.executeTransactionCode(_txdata.initOrInput);
-        EvmSpec.TransactionSubstate storage substate;
-    byte[1] storage output;
-        return (0, substate, output);
-        //return (remainingGas - receipt.gasConsumed, context._substate, new byte[](1));
+        return (remainingGas - context.getGasConsumed(), substate, new byte[](1));
     }
-
-   /*** function execute(EvmSpec.SystemState systemState,
-                     uint256 remainingGas,
-                     EvmSpec.ExecutionEnvironment executionEnvironment)
-            returns (uint256, EvmSpec.AccruedTransactionSubstate, byte[]) {
-        EvmSpec.AccruedTransactionSubstate storage substate;
-        byte[] storage output;
-        return (remainingGas, substate, output);
-    }*/
 }
 
 contract MessageCallTransaction is Transaction {

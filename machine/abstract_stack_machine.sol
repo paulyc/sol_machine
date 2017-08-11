@@ -24,80 +24,70 @@ pragma solidity ^0.4.15;
 
 import '../ethereum_specification.sol';
 import '../ethereum_abi.sol';
+import '../logging.sol';
 
-contract ExecutionContext {
-    AbstractStackMachine _machineCodeExecutor;
-    EvmSpec.SystemState _state;
+contract ExecutionContext is EvmSpec {
+    SystemState _state;
+    AbstractStackMachine _vm;
+    TransactionSubstate _substate;
 
-    function ExecutionContext(AbstractStackMachine machineCodeExecutor) {
-        _machineCodeExecutor = machineCodeExecutor;
-        _state.status = EvmSpec.ExecutionStatus.PRE_EXECUTION;
+    function ExecutionContext(AbstractStackMachine vm) {
+        _state.status = ExecutionStatus.PRE_EXECUTION;
+        _vm = vm;
     }
 
     function executeTransactionCode(byte[] program) {
-        _state.status = EvmSpec.ExecutionStatus.EXECUTING;
-        EvmSpec.TransactionSubstate substate;
-        while (_state.programCounter < program.length) {
-            _machineCodeExecutor.executeInstruction(_state, program, substate);
 
-            if (context._state.status == EvmSpec.ExecutionStatus.HALTED) {
-                // we are done here
-                return;
-            }
+        if (isHalted()) {
+            // Already ran in this context! What to do?
         }
-        halt(context.systemState);
-        _machineCodeExecutor.execute(this, program);
+        _state.status = ExecutionStatus.EXECUTING;
+        _state.executingCode = program;
+
+        while (!isHalted() && _state.programCounter < program.length) {
+            byte opCode = program[_state.programCounter++];
+            _vm.dispatch(opCode, this);
+        }
+        if (!isHalted()) {
+            halt();
+        }
     }
 
     function getStack() returns (EvmStack) {
         return _state.stack;
     }
 
+    function getGasConsumed() returns (uint256) {
+        return _substate.gasConsumed;
+    }
+
     function setStatus(EvmSpec.ExecutionStatus status) {
         _state.status = status;
     }
 
-    function executeNextInstruction() {
+    function halt() {
+        _state.status = ExecutionStatus.HALTED;
+    }
 
+    function isHalted() returns (bool) {
+        return _state.status == ExecutionStatus.HALTED;
+    }
+
+    function consumeGas(uint256 gas) {
+        _substate.gasConsumed += gas;
     }
 }
 
-contract AbstractStackMachine is EthereumABI {
+contract AbstractStackMachine is EvmSpec, EthereumABI {
     mapping(byte => function (ExecutionContext) internal) _operandDispatchTable;
 
-    EvmSpec.WorldState _worldState;
+    WorldState _worldState;
 
     function getContext() returns (ExecutionContext) {
         return new ExecutionContext(this);
     }
 
-    function halt(ExecutionContext context) internal {
-        context.setStatus(EvmSpec.ExecutionStatus.HALTED);
-    }
-
-    function executeInstruction(EvmSpec.SystemState state, byte[] program, EvmSpec.TransactionSubstate substate) {
-        byte operand = program[state.programCounter++];
-
-        _operandDispatchTable[operand](state);
-    }
-
-    function execute(ExecutionContext context, byte[] program) {
-        context.setStatus(EvmSpec.ExecutionStatus.EXECUTING);
-
-        while (context._state.programCounter < program.length) {
-            byte operand = program[context._state.programCounter++];
-
-            _operandDispatchTable[operand](context);
-
-            if (context._state.status == EvmSpec.ExecutionStatus.HALTED) {
-                // we are done here
-                return;
-            }
-        }
-        halt(context.systemState);
-    }
-
-    function isHalted(EvmSpec.SystemState systemState) returns (bool) {
-        return systemState.status == EvmSpec.ExecutionStatus.HALTED;
+    function dispatch(byte opCode, ExecutionContext context) external {
+        _operandDispatchTable[opCode](context);
     }
 }
