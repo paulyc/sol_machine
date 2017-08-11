@@ -25,7 +25,7 @@ pragma solidity ^0.4.15;
 import './abstract_stack_machine.sol';
 import '../ethereum_specification.sol';
 
-contract StopAndArithmeticOperationsMachine is AbstractStackMachine, EvmSpec {
+contract StopAndArithmeticOperationsMachine is AbstractStackMachine {
     function StopAndArithmeticOperationsMachine() AbstractStackMachine() {
         _operandDispatchTable[OP_STOP] = executeStop;
         _operandDispatchTable[OP_ADD] = executeAdd;

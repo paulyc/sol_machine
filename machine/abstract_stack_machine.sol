@@ -23,9 +23,10 @@
 pragma solidity ^0.4.15;
 
 import '../ethereum_specification.sol';
+import '../ethereum_abi.sol';
 import '../stack_owner.sol';
 
-contract AbstractStackMachine {
+contract AbstractStackMachine is EthereumABI {
     mapping(byte => function () internal returns (EvmSpec.ExecutionStatus)) _operandDispatchTable;
 
     EvmSpec.WorldState _worldState;

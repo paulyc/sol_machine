@@ -25,9 +25,7 @@ pragma solidity ^0.4.15;
 // Adapted from the original "yellowpaper" specification,
 // which can be found in PDF form at http://yellowpaper.io/
 
-import './ethereum_abi.sol';
-
-contract EvmSpec is EthereumABI {
+library EvmSpec {
     enum ExecutionStatus {
         PRE_EXECUTION,
         EXECUTING,

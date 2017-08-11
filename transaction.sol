@@ -33,17 +33,17 @@ calls and those which result in the creation of new accounts with associated cod
 informally as ‘contract creation’)
 */
 contract Transaction {
-    EvmSpec.TransactionData _data;
+    EvmSpec.TransactionData _txdata;
 
     function Transaction(uint256 gasPrice, uint256 gasLimit, address to, uint256 value, uint8 v, uint256 r, uint256 s) {
-        _data.nonce = 0;
-        _data.gasPrice = gasPrice;
-        _data.gasLimit = gasLimit;
-        _data.to = to;
-        _data.value = value;
-        _data.v = v;
-        _data.r = r;
-        _data.s = s;
+        _txdata.nonce = 0;
+        _txdata.gasPrice = gasPrice;
+        _txdata.gasLimit = gasLimit;
+        _txdata.to = to;
+        _txdata.value = value;
+        _txdata.v = v;
+        _txdata.r = r;
+        _txdata.s = s;
     }
 
     function execute(EvmSpec.ExecutionContext systemState,
