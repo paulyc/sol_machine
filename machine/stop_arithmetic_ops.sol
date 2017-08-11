@@ -7,10 +7,10 @@
  *  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  *  copies of the Software, and to permit persons to whom the Software is
  *  furnished to do so, subject to the following conditions:
- *  
+ *
  *  The above copyright notice and this permission notice shall be included in all
  *  copies or substantial portions of the Software.
- *  
+ *
  *  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  *  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  *  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -22,51 +22,41 @@
 
 pragma solidity ^0.4.15;
 
-import './environment.sol';
-import './ethereum_abi.sol';
-import './stack_owner.sol';
+import './abstract_stack_machine.sol';
+import '../ethereum_abi.sol';
 
-contract AbstractStackMachine is StackOwner {
-    mapping(byte => function () internal returns (ExecutionStatus)) _operandDispatchTable;
-    
-    Environment.WorldState _worldState;
-    Environment.MachineState _machineState;
-    uint256 _gasAvailable;
-    uint256 _programCounter;
-
-    enum ExecutionStatus {
-        PRE_EXECUTION,
-        EXECUTING,
-        HALTED
-    }
-    ExecutionStatus _executionStatus;
-
-    function AbstractStackMachine() StackOwner(1024) {
-        _machineState.stack = _stack; // may not even be necessary
-        _programCounter = 0;
-        _executionStatus = ExecutionStatus.PRE_EXECUTION;
+contract StopAndArithmeticOperationsMachine is AbstractStackMachine, EthereumABI {
+    function StopAndArithmeticOperationsMachine() AbstractStackMachine() {
+        _operandDispatchTable[OP_STOP] = executeStop;
+        _operandDispatchTable[OP_ADD] = executeAdd;
+        _operandDispatchTable[OP_MUL] = executeMul;
+        _operandDispatchTable[OP_SUB] = executeSub;
+        _operandDispatchTable[OP_DIV] = executeDiv;
+        _operandDispatchTable[OP_SDIV] = executeSdiv;
+        _operandDispatchTable[OP_MOD] = executeMod;
+        _operandDispatchTable[OP_SMOD] = executeSmod;
+        _operandDispatchTable[OP_ADDMOD] = executeAddmod;
+        _operandDispatchTable[OP_MULMOD] = executeMulmod;
+        _operandDispatchTable[OP_EXP] = executeExp;
+        _operandDispatchTable[OP_SIGNEXTEND] = executeSignextend;
     }
 
-    function halt() internal returns (ExecutionStatus) {
-        return ExecutionStatus.HALTED;
-    }
-    
     function executeStop() internal returns (ExecutionStatus) {
         return halt();
     }
-    
+
     function executeAdd() internal returns (ExecutionStatus) {
         uint256 lhs = pop();
         swapTop(lhs + top());
         return ExecutionStatus.EXECUTING;
     }
-    
+
     function executeMul() internal returns (ExecutionStatus) {
         uint256 lhs = pop();
         swapTop(lhs * top());
         return ExecutionStatus.EXECUTING;
     }
-    
+
     function executeSub() internal returns (ExecutionStatus) {
         uint256 lhs = pop();
         swapTop(lhs - top());
@@ -140,45 +130,5 @@ contract AbstractStackMachine is StackOwner {
     function executeSignextend() internal returns (ExecutionStatus) {
         // stubbed no-op
         return ExecutionStatus.EXECUTING;
-    }
-
-    function execute(bytes program) {
-        _executionStatus = ExecutionStatus.EXECUTING;
-        
-        while (_programCounter < program.length) {
-            byte operand = program[_programCounter++];
-            
-            (_executionStatus) = _operandDispatchTable[operand]();
-            
-            if (_executionStatus == ExecutionStatus.HALTED) {
-                // we are done
-                break;
-            }
-        }
-    }
-
-    function isHalted() returns (bool) {
-        return _executionStatus == ExecutionStatus.HALTED;
-    }
-}
-
-contract EthereumStackMachine is AbstractStackMachine, EthereumABI {
-    function EthereumStackMachine() AbstractStackMachine() {
-        _operandDispatchTable[OP_STOP] = executeStop;
-        _operandDispatchTable[OP_ADD] = executeAdd;
-        _operandDispatchTable[OP_MUL] = executeMul;
-        _operandDispatchTable[OP_SUB] = executeSub;
-        _operandDispatchTable[OP_DIV] = executeDiv;
-        _operandDispatchTable[OP_SDIV] = executeSdiv;
-        _operandDispatchTable[OP_MOD] = executeMod;
-        _operandDispatchTable[OP_SMOD] = executeSmod;
-        _operandDispatchTable[OP_ADDMOD] = executeAddmod;
-        _operandDispatchTable[OP_MULMOD] = executeMulmod;
-        _operandDispatchTable[OP_EXP] = executeExp;
-        _operandDispatchTable[OP_SIGNEXTEND] = executeSignextend;
-    }
-    
-    struct PostInstructionState {
-        
     }
 }
