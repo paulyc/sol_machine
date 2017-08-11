@@ -22,52 +22,37 @@
 
 pragma solidity ^0.4.15;
 
-import './abstract_stack_machine.sol';
-import '../ethereum_specification.sol';
+import './executor.sol';
 
-contract StopAndArithmeticOperationsMachine is AbstractStackMachine {
-    function StopAndArithmeticOperationsMachine() AbstractStackMachine() {
-        _operandDispatchTable[OP_STOP] = executeStop;
-        _operandDispatchTable[OP_ADD] = executeAdd;
-        _operandDispatchTable[OP_MUL] = executeMul;
-        _operandDispatchTable[OP_SUB] = executeSub;
-        _operandDispatchTable[OP_DIV] = executeDiv;
-        _operandDispatchTable[OP_SDIV] = executeSdiv;
-        _operandDispatchTable[OP_MOD] = executeMod;
-        _operandDispatchTable[OP_SMOD] = executeSmod;
-        _operandDispatchTable[OP_ADDMOD] = executeAddmod;
-        _operandDispatchTable[OP_MULMOD] = executeMulmod;
-        _operandDispatchTable[OP_EXP] = executeExp;
-        _operandDispatchTable[OP_SIGNEXTEND] = executeSignextend;
-    }
+contract StopAndArithmeticOperations {
 
-    function executeStop(ExecutionContext context) internal {
+    function executeStop(ExecutionContext context) {
         context.halt();
         context.consumeGas(1);
     }
 
-    function executeAdd(ExecutionContext context) internal {
+    function executeAdd(ExecutionContext context)  {
         EvmStack stack = context.getStack();
         uint256 lhs = stack.pop();
         stack.swapTop(lhs + stack.top());
         context.consumeGas(1);
     }
 
-    function executeMul(ExecutionContext context) internal {
+    function executeMul(ExecutionContext context) {
         EvmStack stack = context.getStack();
         uint256 lhs = stack.pop();
         stack.swapTop(lhs * stack.top());
         context.consumeGas(1);
     }
 
-    function executeSub(ExecutionContext context) internal {
+    function executeSub(ExecutionContext context) {
         EvmStack stack = context.getStack();
         uint256 lhs = stack.pop();
         stack.swapTop(lhs - stack.top());
         context.consumeGas(1);
     }
 
-    function executeDiv(ExecutionContext context) internal {
+    function executeDiv(ExecutionContext context) {
         EvmStack stack = context.getStack();
         uint256 numerator = stack.pop();
         uint256 denominator = stack.top();
@@ -79,7 +64,7 @@ contract StopAndArithmeticOperationsMachine is AbstractStackMachine {
         context.consumeGas(1);
     }
 
-    function executeSdiv(ExecutionContext context) internal {
+    function executeSdiv(ExecutionContext context) {
         EvmStack stack = context.getStack();
         int256 numerator = int256(stack.pop());
         int256 denominator = int256(stack.top());
@@ -96,7 +81,7 @@ contract StopAndArithmeticOperationsMachine is AbstractStackMachine {
         context.consumeGas(1);
     }
 
-    function executeMod(ExecutionContext context) internal {
+    function executeMod(ExecutionContext context) {
         EvmStack stack = context.getStack();
         uint256 numerator = stack.pop();
         uint256 denominator = stack.top();
@@ -108,7 +93,7 @@ contract StopAndArithmeticOperationsMachine is AbstractStackMachine {
         context.consumeGas(1);
     }
 
-    function executeSmod(ExecutionContext context) internal {
+    function executeSmod(ExecutionContext context) {
         EvmStack stack = context.getStack();
         int256 numerator = int256(stack.pop());
         int256 denominator = int256(stack.top());
@@ -120,19 +105,19 @@ contract StopAndArithmeticOperationsMachine is AbstractStackMachine {
         context.consumeGas(1);
     }
 
-    function executeAddmod(ExecutionContext context) internal {
+    function executeAddmod(ExecutionContext context) {
         // stubbed no-op
     }
 
-    function executeMulmod(ExecutionContext context) internal {
+    function executeMulmod(ExecutionContext context) {
         // stubbed no-op
     }
 
-    function executeExp(ExecutionContext context) internal {
+    function executeExp(ExecutionContext context) {
         // stubbed no-op
     }
 
-    function executeSignextend(ExecutionContext context) internal {
+    function executeSignextend(ExecutionContext context) {
         // stubbed no-op
     }
 }

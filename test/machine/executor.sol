@@ -22,8 +22,8 @@
 
 pragma solidity ^0.4.15;
 
-import '../../machine/abstract_stack_machine.sol';
+import '../../machine/executor.sol';
 
-contract TestAbstractStackMachine {
+contract TestExecutionContext {
 
 }

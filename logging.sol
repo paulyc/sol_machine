@@ -29,8 +29,12 @@ library Logging {
         byte[] data;
     }
 
-    function bloomFilter(LogEntry[] entries) internal returns (uint256) {
+    function initBloomFilter() returns (bytes) {
+        return new bytes(256);
+    }
+
+    function updateBloomFilter(bytes filter, address loggersAddress, byte[32][] topics) returns (bytes) {
         // stub return dummy value
-        return 0x1111111111111111111111111111111111111111111111111111111111111111;
+        return filter;
     }
 }

@@ -22,8 +22,7 @@
 
 pragma solidity ^0.4.15;
 
-import './ethereum_specification.sol';
-import './machine/abstract_stack_machine.sol';
+import './machine/evm_stack_machine.sol';
 import './logging.sol';
 
 /**
@@ -34,7 +33,19 @@ and dissemination1. There are two types of transactions: those which result in m
 calls and those which result in the creation of new accounts with associated code (known
 informally as ‘contract creation’)
 */
-contract Transaction is EvmSpec {
+contract Transaction {
+    struct Data {
+        uint256 nonce;     // A scalar value equal to the number of trans- actions sent by the sender; formally T_n
+        uint256 gasPrice;  // A scalar value equal to the number of Wei to be paid per unit of gas for all computa- tion costs incurred as a result of the execution of this transaction; formally T_p
+        uint256 gasLimit;  // A scalar value equal to the maximum amount of gas that should be used in executing this transaction. This is paid up-front, before any computation is done and may not be increased later; formally T_g
+        address to;        // The 160-bit address of the message call’s recipi- ent or, for a contract creation transaction, ∅, used here to denote the only member of B0 ; formally T_t
+        uint256 value;     // A scalar value equal to the number of Wei to be transferred to the message call’s recipient or, in the case of contract creation, as an endowment to the newly created account; formally T_v
+        // Values corresponding to the signature of the transaction and used to determine the sender of the transaction; formally T_w, T_r and T_s
+        uint8   v;
+        uint256 r;
+        uint256 s;
+        byte[]  initOrInput; // init code for contract creation, input data for message passing
+    }
 
     struct AccumulatedSubstate {
         address[] selfDestructSet;
@@ -44,13 +55,13 @@ contract Transaction is EvmSpec {
     }
 
     struct Receipt {
-        SystemState postTransactionState;
+        ExecutionContext.SystemState postTransactionState;
         uint256 gasConsumed;
         Logging.LogEntry[] logSeries;
-        uint256 bloomFilter;
+        bytes bloomFilter;
     }
 
-    TransactionData _txdata;
+    Data _txdata;
 
     function Transaction(uint256 gasPrice, uint256 gasLimit, address to, uint256 value, uint8 v, uint256 r, uint256 s, byte[] initOrInput) {
         _txdata.nonce = 0;
@@ -64,7 +75,7 @@ contract Transaction is EvmSpec {
         _txdata.initOrInput = initOrInput;
     }
 
-    function execute(AbstractStackMachine virtualMachine, uint256 preRemainingGas) internal
+    function execute(EthereumStackMachine virtualMachine, uint256 preRemainingGas) internal
         returns (uint256 postRemainingGas, AccumulatedSubstate, byte[] output);
     
     function verifyTransaction() {
@@ -90,7 +101,7 @@ contract ContractCreationTransaction is Transaction {
 
     AccumulatedSubstate substate;
 
-    function execute(AbstractStackMachine virtualMachine, uint256 remainingGas) internal
+    function execute(EthereumStackMachine virtualMachine, uint256 remainingGas) internal
             returns (uint256 newRemainingGas, AccumulatedSubstate, byte[] output)  {
         ExecutionContext context = virtualMachine.getContext();
         context.executeTransactionCode(_txdata.initOrInput);
