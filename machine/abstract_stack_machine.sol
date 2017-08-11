@@ -24,41 +24,80 @@ pragma solidity ^0.4.15;
 
 import '../ethereum_specification.sol';
 import '../ethereum_abi.sol';
-import '../stack_owner.sol';
 
-contract AbstractStackMachine is EthereumABI {
-    mapping(byte => function () internal returns (EvmSpec.ExecutionStatus)) _operandDispatchTable;
+contract ExecutionContext {
+    AbstractStackMachine _machineCodeExecutor;
+    EvmSpec.SystemState _state;
 
-    EvmSpec.WorldState _worldState;
-    EvmSpec.ExecutionContext _executionContext;
-    StackOwner _stack;
-
-    function AbstractStackMachine() {
-        _executionContext.programCounter = 0;
-        _executionContext.status = EvmSpec.ExecutionStatus.PRE_EXECUTION;
-        _stack = new StackOwner(_executionContext.stack);
+    function ExecutionContext(AbstractStackMachine machineCodeExecutor) {
+        _machineCodeExecutor = machineCodeExecutor;
+        _state.status = EvmSpec.ExecutionStatus.PRE_EXECUTION;
     }
 
-    function halt() internal returns (EvmSpec.ExecutionStatus) {
-        return EvmSpec.ExecutionStatus.HALTED;
-    }
+    function executeTransactionCode(byte[] program) {
+        _state.status = EvmSpec.ExecutionStatus.EXECUTING;
+        EvmSpec.TransactionSubstate substate;
+        while (_state.programCounter < program.length) {
+            _machineCodeExecutor.executeInstruction(_state, program, substate);
 
-    function execute(byte[] program) {
-        _executionContext.status = EvmSpec.ExecutionStatus.EXECUTING;
-
-        while (_executionContext.programCounter < program.length) {
-            byte operand = program[_executionContext.programCounter++];
-
-            (_executionContext.status) = _operandDispatchTable[operand]();
-
-            if (_executionContext.status == EvmSpec.ExecutionStatus.HALTED) {
-                // we are done
-                break;
+            if (context._state.status == EvmSpec.ExecutionStatus.HALTED) {
+                // we are done here
+                return;
             }
         }
+        halt(context.systemState);
+        _machineCodeExecutor.execute(this, program);
     }
 
-    function isHalted() returns (bool) {
-        return _executionContext.status == EvmSpec.ExecutionStatus.HALTED;
+    function getStack() returns (EvmStack) {
+        return _state.stack;
+    }
+
+    function setStatus(EvmSpec.ExecutionStatus status) {
+        _state.status = status;
+    }
+
+    function executeNextInstruction() {
+
+    }
+}
+
+contract AbstractStackMachine is EthereumABI {
+    mapping(byte => function (ExecutionContext) internal) _operandDispatchTable;
+
+    EvmSpec.WorldState _worldState;
+
+    function getContext() returns (ExecutionContext) {
+        return new ExecutionContext(this);
+    }
+
+    function halt(ExecutionContext context) internal {
+        context.setStatus(EvmSpec.ExecutionStatus.HALTED);
+    }
+
+    function executeInstruction(EvmSpec.SystemState state, byte[] program, EvmSpec.TransactionSubstate substate) {
+        byte operand = program[state.programCounter++];
+
+        _operandDispatchTable[operand](state);
+    }
+
+    function execute(ExecutionContext context, byte[] program) {
+        context.setStatus(EvmSpec.ExecutionStatus.EXECUTING);
+
+        while (context._state.programCounter < program.length) {
+            byte operand = program[context._state.programCounter++];
+
+            _operandDispatchTable[operand](context);
+
+            if (context._state.status == EvmSpec.ExecutionStatus.HALTED) {
+                // we are done here
+                return;
+            }
+        }
+        halt(context.systemState);
+    }
+
+    function isHalted(EvmSpec.SystemState systemState) returns (bool) {
+        return systemState.status == EvmSpec.ExecutionStatus.HALTED;
     }
 }

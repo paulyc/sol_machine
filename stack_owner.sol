@@ -22,14 +22,10 @@
 
 pragma solidity ^0.4.15;
 
-contract StackOwner {
+// rename this
+contract EvmStack {
     uint256[1024] _stack;
     uint256       _stackPointer; // offset of the invalid element on the very top of stack
-
-    function StackOwner(uint256[1024] stack) {
-        _stack = stack;
-        _stackPointer = 0;
-    }
 
     function push(uint256 value) {
         require(_stackPointer < _stack.length);

@@ -22,17 +22,5 @@
 
 pragma solidity ^0.4.15;
 
-import './stop_arithmetic_ops.sol';
-import './comp_logic_ops.sol';
+import './abstract_stack_machine.sol';
 
-contract EthereumStackMachine is
-        StopAndArithmeticOperationsMachine,
-        ComputationAndLogicalOperationsMachine {
-
-    /**function EthereumStackMachine()
-        StopAndArithmeticOperationsMachine()
-        ComputationAndLogicalOperationsMachine() {
-
-    }*/
-
-}

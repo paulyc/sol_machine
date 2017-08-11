@@ -41,94 +41,90 @@ contract StopAndArithmeticOperationsMachine is AbstractStackMachine {
         _operandDispatchTable[OP_SIGNEXTEND] = executeSignextend;
     }
 
-    function executeStop() internal returns (EvmSpec.ExecutionStatus) {
-        return halt();
+    function executeStop(ExecutionContext context) internal {
+        halt(context);
     }
 
-    function executeAdd() internal returns (EvmSpec.ExecutionStatus) {
-        uint256 lhs = _stack.pop();
-        _stack.swapTop(lhs + _stack.top());
-        return EvmSpec.ExecutionStatus.EXECUTING;
+    function executeAdd(ExecutionContext context) internal {
+        EvmStack stack = context._state._stack;
+        uint256 lhs = stack.pop();
+        stack.swapTop(lhs + stack.top());
     }
 
-    function executeMul() internal returns (EvmSpec.ExecutionStatus) {
-        uint256 lhs = _stack.pop();
-        _stack.swapTop(lhs * _stack.top());
-        return EvmSpec.ExecutionStatus.EXECUTING;
+    function executeMul(ExecutionContext context) internal {
+        EvmStack stack = context._state._stack;
+        uint256 lhs = stack.pop();
+        stack.swapTop(lhs * stack.top());
     }
 
-    function executeSub() internal returns (EvmSpec.ExecutionStatus) {
-        uint256 lhs = _stack.pop();
-        _stack.swapTop(lhs - _stack.top());
-        return EvmSpec.ExecutionStatus.EXECUTING;
+    function executeSub(ExecutionContext context) internal {
+        EvmStack stack = context._state._stack;
+        uint256 lhs = stack.pop();
+        stack.swapTop(lhs - stack.top());
     }
 
-    function executeDiv() internal returns (EvmSpec.ExecutionStatus) {
-        uint256 numerator = _stack.pop();
-        uint256 denominator = _stack.top();
+    function executeDiv(ExecutionContext context) internal {
+        EvmStack stack = context._state._stack;
+        uint256 numerator = stack.pop();
+        uint256 denominator = stack.top();
         if (denominator == 0) {
-            _stack.swapTop(0);
+            stack.swapTop(0);
         } else {
-            _stack.swapTop(numerator / denominator);
+            stack.swapTop(numerator / denominator);
         }
-        return EvmSpec.ExecutionStatus.EXECUTING;
     }
 
-    function executeSdiv() internal returns (EvmSpec.ExecutionStatus) {
-        int256 numerator = int256(_stack.pop());
-        int256 denominator = int256(_stack.top());
+    function executeSdiv(ExecutionContext context) internal {
+        EvmStack stack = context._state._stack;
+        int256 numerator = int256(stack.pop());
+        int256 denominator = int256(stack.top());
         if (denominator == 0) {
-            _stack.swapTop(0);
+            stack.swapTop(0);
         } else if (numerator == 0x800000000000000000000000000000000000000000000000 && denominator == -1) {
             // If you were wondering, 0x800000000000000000000000000000000000000000000000 is binary 2's complement for -2^255
             // and although -2^255 / -1 = 2^255 in normal math, in signed 256-bit 2's complement, it overflows,
             // so the actual result here is -2^255. Don't ask me, I don't make the rules, I just implement them
-            _stack.swapTop(0x800000000000000000000000000000000000000000000000);
+            stack.swapTop(0x800000000000000000000000000000000000000000000000);
         } else {
-            _stack.swapTop(uint256(numerator / denominator));
+            stack.swapTop(uint256(numerator / denominator));
         }
-        return EvmSpec.ExecutionStatus.EXECUTING;
     }
 
-    function executeMod() internal returns (EvmSpec.ExecutionStatus) {
-        uint256 numerator = _stack.pop();
-        uint256 denominator = _stack.top();
+    function executeMod(ExecutionContext context) internal {
+        EvmStack stack = context._state._stack;
+        uint256 numerator = stack.pop();
+        uint256 denominator = stack.top();
         if (denominator == 0) {
-            _stack.swapTop(0);
+            stack.swapTop(0);
         } else {
-            _stack.swapTop(numerator % denominator);
+            stack.swapTop(numerator % denominator);
         }
-        return EvmSpec.ExecutionStatus.EXECUTING;
     }
 
-    function executeSmod() internal returns (EvmSpec.ExecutionStatus) {
-        int256 numerator = int256(_stack.pop());
-        int256 denominator = int256(_stack.top());
+    function executeSmod(ExecutionContext context) internal {
+        EvmStack stack = context._state._stack;
+        int256 numerator = int256(stack.pop());
+        int256 denominator = int256(stack.top());
         if (denominator == 0) {
-            _stack.swapTop(0);
+            stack.swapTop(0);
         } else {
-            _stack.swapTop(uint256(numerator % denominator));
+            stack.swapTop(uint256(numerator % denominator));
         }
-        return EvmSpec.ExecutionStatus.EXECUTING;
     }
 
-    function executeAddmod() internal returns (EvmSpec.ExecutionStatus) {
+    function executeAddmod(ExecutionContext context) internal {
         // stubbed no-op
-        return EvmSpec.ExecutionStatus.EXECUTING;
     }
 
-    function executeMulmod() internal returns (EvmSpec.ExecutionStatus) {
+    function executeMulmod(ExecutionContext context) internal {
         // stubbed no-op
-        return EvmSpec.ExecutionStatus.EXECUTING;
     }
 
-    function executeExp() internal returns (EvmSpec.ExecutionStatus) {
+    function executeExp(ExecutionContext context) internal {
         // stubbed no-op
-        return EvmSpec.ExecutionStatus.EXECUTING;
     }
 
-    function executeSignextend() internal returns (EvmSpec.ExecutionStatus) {
+    function executeSignextend(ExecutionContext context) internal {
         // stubbed no-op
-        return EvmSpec.ExecutionStatus.EXECUTING;
     }
 }

@@ -23,6 +23,7 @@
 pragma solidity ^0.4.15;
 
 import './ethereum_specification.sol';
+import './machine/evm_stack_machine.sol';
 
 /**
 A transaction (formally, T) is a single cryptographically-signed instruction constructed
@@ -33,9 +34,14 @@ calls and those which result in the creation of new accounts with associated cod
 informally as ‘contract creation’)
 */
 contract Transaction {
+    //struct Receipt {
+    //    EvmSpec.SystemState postTransactionState;
+    //    uint256 gasConsumed;
+   // }
+
     EvmSpec.TransactionData _txdata;
 
-    function Transaction(uint256 gasPrice, uint256 gasLimit, address to, uint256 value, uint8 v, uint256 r, uint256 s) {
+    function Transaction(uint256 gasPrice, uint256 gasLimit, address to, uint256 value, uint8 v, uint256 r, uint256 s, byte[] initOrInput) {
         _txdata.nonce = 0;
         _txdata.gasPrice = gasPrice;
         _txdata.gasLimit = gasLimit;
@@ -44,16 +50,16 @@ contract Transaction {
         _txdata.v = v;
         _txdata.r = r;
         _txdata.s = s;
+        _txdata.initOrInput = initOrInput;
     }
 
-    function execute(EvmSpec.ExecutionContext systemState,
+    function execute(EthereumStackMachine virtualMachine, uint256 preRemainingGas) internal
+        returns (uint256 postRemainingGas, EvmSpec.TransactionSubstate, byte[] output);
+
+    /**function execute(EvmSpec.SystemState systemState,
                      uint256 remainingGas,
-                     EvmSpec.ExecutionEnvironment executionEnvironment) private
-            returns (EvmSpec.ExecutionContext, uint256, EvmSpec.AccruedTransactionSubstate, byte[]) {
-        EvmSpec.AccruedTransactionSubstate storage accruedSubstate;
-        byte[] storage output;
-        return (systemState, remainingGas, accruedSubstate, output);
-    }
+                     EvmSpec.ExecutionEnvironment executionEnvironment)
+            returns (uint256, EvmSpec.AccruedTransactionSubstate, byte[]);*/
     
     function verifyTransaction() {
         /**
@@ -70,21 +76,40 @@ contract Transaction {
 }
 
 contract ContractCreationTransaction is Transaction {
-    byte[] _init;
 
     // init: An unlimited size byte array specifying the EVM-code for the account initialisation proce- dure, formally T_i.
     function ContractCreationTransaction(byte[] init, uint256 gasPrice, uint256 gasLimit, address to, uint256 value, uint8 v, uint256 r, uint256 s)
-        Transaction(gasPrice, gasLimit, to, value, v, r, s) {
-        _init = init;
+        Transaction(gasPrice, gasLimit, to, value, v, r, s, init) {
     }
+
+EvmSpec.TransactionSubstate substate;
+
+    function execute(EthereumStackMachine virtualMachine, uint256 remainingGas) internal
+    returns (uint256 newRemainingGas, EvmSpec.TransactionSubstate, byte[] output)  {
+        EvmSpec.TransactionSubstate storage substate;
+        ExecutionContext context = virtualMachine.getContext();
+        //EvmSpec.TransactionReceipt memory receipt = context.executeTransactionCode(_txdata.initOrInput);
+        context.executeTransactionCode(_txdata.initOrInput);
+        EvmSpec.TransactionSubstate storage substate;
+    byte[1] storage output;
+        return (0, substate, output);
+        //return (remainingGas - receipt.gasConsumed, context._substate, new byte[](1));
+    }
+
+   /*** function execute(EvmSpec.SystemState systemState,
+                     uint256 remainingGas,
+                     EvmSpec.ExecutionEnvironment executionEnvironment)
+            returns (uint256, EvmSpec.AccruedTransactionSubstate, byte[]) {
+        EvmSpec.AccruedTransactionSubstate storage substate;
+        byte[] storage output;
+        return (remainingGas, substate, output);
+    }*/
 }
 
 contract MessageCallTransaction is Transaction {
-    byte[] _data;
 
     // An unlimited size byte array specifying the input data of the message call, formally T_d
     function MessageCallTransaction(byte[] data, uint256 gasPrice, uint256 gasLimit, address to, uint256 value, uint8 v, uint256 r, uint256 s)
-        Transaction(gasPrice, gasLimit, to, value, v, r, s) {
-        _data = data;
+        Transaction(gasPrice, gasLimit, to, value, v, r, s, data) {
     }
 }

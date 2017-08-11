@@ -24,61 +24,59 @@ pragma solidity ^0.4.15;
 
 import '../stack_owner.sol';
 
-contract TestStackOwner {
-    StackOwner ownerUnderTest;
-    uint256[1024] stackBacking; // shouldn't matter if shared between tests
-                                // since stack pointer resets
+contract TestEvmStack {
+    EvmStack stackUnderTest;
 
     function TestStackOwner() {
     }
 
     function testInit() {
-        ownerUnderTest = new StackOwner(stackBacking);
-        require(ownerUnderTest.isEmpty());
-        require(ownerUnderTest.capacity() == 1024);
-        require(ownerUnderTest.size() == 0);
+        stackUnderTest = new EvmStack();
+        require(stackUnderTest.isEmpty());
+        require(stackUnderTest.capacity() == 1024);
+        require(stackUnderTest.size() == 0);
     }
 
     function testPush() {
-        ownerUnderTest = new StackOwner(stackBacking);
-        ownerUnderTest.push(1);
-        require(!ownerUnderTest.isEmpty());
-        require(ownerUnderTest.size() == 1);
-        ownerUnderTest.push(2);
-        ownerUnderTest.push(3);
-        require(ownerUnderTest.size() == 3);
-        require(ownerUnderTest.top() == 3);
-        require(ownerUnderTest.stackOffset(2) == 1);
-        require(ownerUnderTest.capacity() == 1024);
+        stackUnderTest = new EvmStack();
+        stackUnderTest.push(1);
+        require(!stackUnderTest.isEmpty());
+        require(stackUnderTest.size() == 1);
+        stackUnderTest.push(2);
+        stackUnderTest.push(3);
+        require(stackUnderTest.size() == 3);
+        require(stackUnderTest.top() == 3);
+        require(stackUnderTest.stackOffset(2) == 1);
+        require(stackUnderTest.capacity() == 1024);
     }
 
     function testPop() {
-        ownerUnderTest = new StackOwner(stackBacking);
-        ownerUnderTest.push(1);
-        ownerUnderTest.push(2);
-        ownerUnderTest.push(3);
-        require(ownerUnderTest.pop() == 3);
-        require(ownerUnderTest.top() == 2);
-        require(ownerUnderTest.size() == 2);
-        require(ownerUnderTest.stackOffset(1) == 1);
-        require(ownerUnderTest.pop() == 2);
-        require(ownerUnderTest.pop() == 1);
-        require(ownerUnderTest.isEmpty());
-        require(ownerUnderTest.size() == 0);
-        require(ownerUnderTest.capacity() == 1024);
+        stackUnderTest = new EvmStack();
+        stackUnderTest.push(1);
+        stackUnderTest.push(2);
+        stackUnderTest.push(3);
+        require(stackUnderTest.pop() == 3);
+        require(stackUnderTest.top() == 2);
+        require(stackUnderTest.size() == 2);
+        require(stackUnderTest.stackOffset(1) == 1);
+        require(stackUnderTest.pop() == 2);
+        require(stackUnderTest.pop() == 1);
+        require(stackUnderTest.isEmpty());
+        require(stackUnderTest.size() == 0);
+        require(stackUnderTest.capacity() == 1024);
     }
 
     function testSwapTop() {
-        ownerUnderTest = new StackOwner(stackBacking);
-        ownerUnderTest.push(1);
-        ownerUnderTest.push(2);
-        ownerUnderTest.push(3);
-        require(ownerUnderTest.swapTop(4) == 3);
-        require(ownerUnderTest.top() == 4);
-        require(ownerUnderTest.size() == 3);
-        require(ownerUnderTest.pop() == 4);
-        require(ownerUnderTest.pop() == 2);
-        require(ownerUnderTest.pop() == 1);
-        require(ownerUnderTest.isEmpty());
+        stackUnderTest = new EvmStack();
+        stackUnderTest.push(1);
+        stackUnderTest.push(2);
+        stackUnderTest.push(3);
+        require(stackUnderTest.swapTop(4) == 3);
+        require(stackUnderTest.top() == 4);
+        require(stackUnderTest.size() == 3);
+        require(stackUnderTest.pop() == 4);
+        require(stackUnderTest.pop() == 2);
+        require(stackUnderTest.pop() == 1);
+        require(stackUnderTest.isEmpty());
     }
 }

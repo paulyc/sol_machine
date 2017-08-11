@@ -25,6 +25,8 @@ pragma solidity ^0.4.15;
 // Adapted from the original "yellowpaper" specification,
 // which can be found in PDF form at http://yellowpaper.io/
 
+import './stack_owner.sol';
+
 library EvmSpec {
     enum ExecutionStatus {
         PRE_EXECUTION,
@@ -32,14 +34,13 @@ library EvmSpec {
         HALTED
     }
 
-    struct ExecutionContext {
-        uint256[1024]               stack;
+    struct SystemState {
+        EvmStack                    stack;
         uint256[]                   memory_;
         mapping(uint256 => uint256) storage_;
         
         uint256 gasAvailable;
         uint256 programCounter;
-        uint256 stackPointer;
 
         ExecutionStatus status;
     }
@@ -102,19 +103,17 @@ library EvmSpec {
         uint8   v;
         uint256 r;
         uint256 s;
+        byte[]  initOrInput; // init code for contract creation, input data for message passing
     }
 
-    struct Refund {
-
-    }
-
-    struct Suicide {
-
-    }
-
-    struct AccruedTransactionSubstate {
-        Suicide[] suicidesSet;
+    struct TransactionSubstate {
+        address[] selfDestructSet;
         LogEntry[] logSeries;
-        Refund[] refunds;
+        uint256 refundBalance;
+    }
+
+    struct TransactionReceipt {
+        SystemState postTransactionState;
+        uint256 gasConsumed;
     }
 }
