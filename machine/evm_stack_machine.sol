@@ -200,7 +200,16 @@ contract EthereumStackMachine is MachineCodeExecutor, StopAndArithmeticOperation
         _operandDispatchTable[opCode](context);
     }
 
+    function illegalOperation(ExecutionContext context) {
+
+    }
+
     function EthereumStackMachine() {
+        for (uint8 i = 0x00; i <= 0xFF; ++i) {
+            _operandDispatchTable[byte(i)] = illegalOperation;
+        }
+
+        // Stop and Arithmetic Operations
         _operandDispatchTable[OP_STOP]          = executeStop;
         _operandDispatchTable[OP_ADD]           = executeAdd;
         _operandDispatchTable[OP_MUL]           = executeMul;
@@ -213,5 +222,145 @@ contract EthereumStackMachine is MachineCodeExecutor, StopAndArithmeticOperation
         _operandDispatchTable[OP_MULMOD]        = executeMulmod;
         _operandDispatchTable[OP_EXP]           = executeExp;
         _operandDispatchTable[OP_SIGNEXTEND]    = executeSignextend;
+
+        // Comparison and Bitwise Logic Operations
+        _operandDispatchTable[OP_LT];
+        _operandDispatchTable[OP_GT];
+        _operandDispatchTable[OP_SLT];
+        _operandDispatchTable[OP_SGT];
+        _operandDispatchTable[OP_EQ];
+        _operandDispatchTable[OP_ISZERO];
+        _operandDispatchTable[OP_AND];
+        _operandDispatchTable[OP_OR];
+        _operandDispatchTable[OP_XOR];
+        _operandDispatchTable[OP_NOT];
+        _operandDispatchTable[OP_BYTE];
+
+        // SHA3
+        _operandDispatchTable[OP_SHA3];
+
+        // Environmental Information
+        _operandDispatchTable[OP_ADDRESS];
+        _operandDispatchTable[OP_BALANCE];
+        _operandDispatchTable[OP_ORIGIN];
+        _operandDispatchTable[OP_CALLER];
+        _operandDispatchTable[OP_CALLVALUE];
+        _operandDispatchTable[OP_CALLDATALOAD];
+        _operandDispatchTable[OP_CALLDATASIZE];
+        _operandDispatchTable[OP_CALLDATACOPY];
+        _operandDispatchTable[OP_CODESIZE];
+        _operandDispatchTable[OP_CODECOPY];
+        _operandDispatchTable[OP_GASPRICE];
+        _operandDispatchTable[OP_EXTCODESIZE];
+        _operandDispatchTable[OP_EXTCODECOPY];
+
+        // Block Information
+        _operandDispatchTable[OP_BLOCKHASH];
+        _operandDispatchTable[OP_COINBASE];
+        _operandDispatchTable[OP_TIMESTAMP];
+        _operandDispatchTable[OP_NUMBER];
+        _operandDispatchTable[OP_DIFFICULTY];
+        _operandDispatchTable[OP_GASLIMIT];
+
+        // Stack, Memory, Storage, and Flow Operations
+        _operandDispatchTable[OP_POP];
+        _operandDispatchTable[OP_MLOAD];
+        _operandDispatchTable[OP_MSTORE];
+        _operandDispatchTable[OP_MSTORE8];
+        _operandDispatchTable[OP_SLOAD];
+        _operandDispatchTable[OP_SSTORE];
+        _operandDispatchTable[OP_JUMP];
+        _operandDispatchTable[OP_JUMPI];
+        _operandDispatchTable[OP_PC];
+        _operandDispatchTable[OP_MSIZE];
+        _operandDispatchTable[OP_GAS];
+        _operandDispatchTable[OP_JUMPDEST];
+
+        // Push Operations
+        _operandDispatchTable[OP_PUSH1];
+        _operandDispatchTable[OP_PUSH2];
+        _operandDispatchTable[OP_PUSH3];
+        _operandDispatchTable[OP_PUSH4];
+        _operandDispatchTable[OP_PUSH5];
+        _operandDispatchTable[OP_PUSH6];
+        _operandDispatchTable[OP_PUSH7];
+        _operandDispatchTable[OP_PUSH8];
+        _operandDispatchTable[OP_PUSH9];
+        _operandDispatchTable[OP_PUSH10];
+        _operandDispatchTable[OP_PUSH11];
+        _operandDispatchTable[OP_PUSH12];
+        _operandDispatchTable[OP_PUSH13];
+        _operandDispatchTable[OP_PUSH14];
+        _operandDispatchTable[OP_PUSH15];
+        _operandDispatchTable[OP_PUSH16];
+        _operandDispatchTable[OP_PUSH17];
+        _operandDispatchTable[OP_PUSH18];
+        _operandDispatchTable[OP_PUSH19];
+        _operandDispatchTable[OP_PUSH20];
+        _operandDispatchTable[OP_PUSH21];
+        _operandDispatchTable[OP_PUSH22];
+        _operandDispatchTable[OP_PUSH23];
+        _operandDispatchTable[OP_PUSH24];
+        _operandDispatchTable[OP_PUSH25];
+        _operandDispatchTable[OP_PUSH26];
+        _operandDispatchTable[OP_PUSH27];
+        _operandDispatchTable[OP_PUSH28];
+        _operandDispatchTable[OP_PUSH29];
+        _operandDispatchTable[OP_PUSH30];
+        _operandDispatchTable[OP_PUSH31];
+        _operandDispatchTable[OP_PUSH32];
+
+        // Duplication Operations
+        _operandDispatchTable[OP_DUP1];
+        _operandDispatchTable[OP_DUP2];
+        _operandDispatchTable[OP_DUP3];
+        _operandDispatchTable[OP_DUP4];
+        _operandDispatchTable[OP_DUP5];
+        _operandDispatchTable[OP_DUP6];
+        _operandDispatchTable[OP_DUP7];
+        _operandDispatchTable[OP_DUP8];
+        _operandDispatchTable[OP_DUP9];
+        _operandDispatchTable[OP_DUP10];
+        _operandDispatchTable[OP_DUP11];
+        _operandDispatchTable[OP_DUP12];
+        _operandDispatchTable[OP_DUP13];
+        _operandDispatchTable[OP_DUP14];
+        _operandDispatchTable[OP_DUP15];
+        _operandDispatchTable[OP_DUP16];
+
+        // Exchange Operations
+        _operandDispatchTable[OP_SWAP1];
+        _operandDispatchTable[OP_SWAP2];
+        _operandDispatchTable[OP_SWAP3];
+        _operandDispatchTable[OP_SWAP4];
+        _operandDispatchTable[OP_SWAP5];
+        _operandDispatchTable[OP_SWAP6];
+        _operandDispatchTable[OP_SWAP7];
+        _operandDispatchTable[OP_SWAP8];
+        _operandDispatchTable[OP_SWAP9];
+        _operandDispatchTable[OP_SWAP10];
+        _operandDispatchTable[OP_SWAP11];
+        _operandDispatchTable[OP_SWAP12];
+        _operandDispatchTable[OP_SWAP13];
+        _operandDispatchTable[OP_SWAP14];
+        _operandDispatchTable[OP_SWAP15];
+        _operandDispatchTable[OP_SWAP16];
+
+        // Logging Operations
+        _operandDispatchTable[OP_LOG0];
+        _operandDispatchTable[OP_LOG1];
+        _operandDispatchTable[OP_LOG2];
+        _operandDispatchTable[OP_LOG3];
+        _operandDispatchTable[OP_LOG4];
+
+        // System Operations
+        _operandDispatchTable[OP_CREATE];
+        _operandDispatchTable[OP_CALL  ];
+        _operandDispatchTable[OP_CALLCODE];
+        _operandDispatchTable[OP_RETURN];
+        _operandDispatchTable[OP_DELEGATECALL];
+
+        // Halt Execution, Mark for Deletion
+        _operandDispatchTable[OP_SELFDESTRUCT];
     }
 }

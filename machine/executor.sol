@@ -37,19 +37,6 @@ contract ExecutionContext {
         HALTED
     }
 
-    struct SystemState {
-        EvmStack                    stack;
-        uint256[]                   memory_;
-        mapping(uint256 => uint256) storage_;
-
-        uint256 gasAvailable;
-        uint256 gasConsumed;
-        uint256 programCounter;
-
-        ExecutionStatus status;
-        byte[] executingCode;
-    }
-
     struct ExecutionEnvironment {
         address codeOwner;                  // I_a, the address of the account which owns the code that is executing
         address transactionOriginator;      // I_o, the sender address of the transaction that originated this execution.
@@ -60,6 +47,19 @@ contract ExecutionContext {
         byte[]  machineCode;                // I_b, the byte array that is the machine code to be executed
         uint256 blockHeader;                // I_H, the block header of the present block
         uint256 callOrCreateDepth;          // I_e, the depth of the present message-call or contract-creation (i.e. the number of CALLs or CREATEs being executed at present)
+    }
+
+    struct SystemState {
+        EvmStack                    stack;
+        uint256[]                   memory_;
+        mapping(uint256 => uint256) storage_;
+
+        uint256 gasAvailable;
+        uint256 gasConsumed;
+        uint256 programCounter;
+
+        ExecutionStatus      status;
+        ExecutionEnvironment environment;
     }
 
     SystemState _state;
@@ -75,7 +75,7 @@ contract ExecutionContext {
             // Already ran in this context! What to do?
         }
         _state.status = ExecutionStatus.EXECUTING;
-        _state.executingCode = program;
+        _state.environment.machineCode = program;
 
         while (!isHalted() && _state.programCounter < program.length) {
             byte opCode = program[_state.programCounter++];
