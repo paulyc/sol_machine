@@ -22,11 +22,7 @@
 
 pragma solidity ^0.4.15;
 
-import './stop_arithmetic_ops.sol';
-
-contract EthereumStackMachine is MachineCodeExecutor, StopAndArithmeticOperations {
-
-    // Opcodes
+contract Constants {
     // Stop and Arithmetic Operations
     byte constant OP_STOP       = 0x00;
     byte constant OP_ADD        = 0x01;
@@ -180,38 +176,4 @@ contract EthereumStackMachine is MachineCodeExecutor, StopAndArithmeticOperation
 
     // Halt Execution, Mark for Deletion
     byte constant OP_SELFDESTRUCT = 0xff;
-
-    struct AccountState {
-        uint256 nonce;
-        uint256 balance;
-        uint256 storageRoot;
-        uint256 codeHash;
-    }
-
-    mapping(address => AccountState) WorldState;
-
-    mapping(byte => function (ExecutionContext)) _operandDispatchTable;
-
-    function getContext() returns (ExecutionContext) {
-        return new ExecutionContext(this);
-    }
-
-    function dispatch(byte opCode, ExecutionContext context) {
-        _operandDispatchTable[opCode](context);
-    }
-
-    function EthereumStackMachine() {
-        _operandDispatchTable[OP_STOP]          = executeStop;
-        _operandDispatchTable[OP_ADD]           = executeAdd;
-        _operandDispatchTable[OP_MUL]           = executeMul;
-        _operandDispatchTable[OP_SUB]           = executeSub;
-        _operandDispatchTable[OP_DIV]           = executeDiv;
-        _operandDispatchTable[OP_SDIV]          = executeSdiv;
-        _operandDispatchTable[OP_MOD]           = executeMod;
-        _operandDispatchTable[OP_SMOD]          = executeSmod;
-        _operandDispatchTable[OP_ADDMOD]        = executeAddmod;
-        _operandDispatchTable[OP_MULMOD]        = executeMulmod;
-        _operandDispatchTable[OP_EXP]           = executeExp;
-        _operandDispatchTable[OP_SIGNEXTEND]    = executeSignextend;
-    }
 }

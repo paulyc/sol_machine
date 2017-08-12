@@ -22,14 +22,15 @@
 
 pragma solidity ^0.4.15;
 
-import '../../machine/stop_arithmetic_ops.sol';
+import '../contracts/evm_stack_machine.sol';
 
-contract TestStopAndArithmeticOperations {
-    StopAndArithmeticOperations stackMachine;
+contract TestEthereumStackMachine is Constants {
+/*
+    EthereumStackMachine stackMachine;
 
     function testStop() {
-        stackMachine = new StopAndArithmeticOperations();
-        byte[1] memory testCode = OP_STOP;
+        stackMachine = new EthereumStackMachine();
+        bytes1 memory testCode = OP_STOP;
         stackMachine.push(1);
         stackMachine.push(2);
         stackMachine.execute(testCode);
@@ -39,7 +40,7 @@ contract TestStopAndArithmeticOperations {
     }
 
     function testAdd() {
-        stackMachine = new StopAndArithmeticOperations();
+        stackMachine = new EthereumStackMachine();
         byte[1] memory testCode = OP_ADD;
         stackMachine.push(1);
         stackMachine.push(2);
@@ -50,7 +51,7 @@ contract TestStopAndArithmeticOperations {
     }
 
     function testSub() {
-        stackMachine = new StopAndArithmeticOperations();
+        stackMachine = new EthereumStackMachine();
         byte[1] memory testCode = OP_SUB;
         stackMachine.push(1);
         stackMachine.push(2);
@@ -61,7 +62,7 @@ contract TestStopAndArithmeticOperations {
     }
 
     function testDiv() {
-        stackMachine = new StopAndArithmeticOperations();
+        stackMachine = new EthereumStackMachine();
         byte[1] memory testCode = OP_DIV;
         stackMachine.push(22);
         stackMachine.push(99);
@@ -69,5 +70,6 @@ contract TestStopAndArithmeticOperations {
         require(stackMachine.pop() == 4);
         require(stackMachine.isEmpty());
         require(stackMachine.isHalted());
-    }
+    }*/
+
 }

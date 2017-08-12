@@ -22,8 +22,19 @@
 
 pragma solidity ^0.4.15;
 
-import '../../machine/comp_logic_ops.sol';
+library Logging {
+    struct LogEntry {
+        address loggersAddress;
+        bytes32[] topics;
+        byte[] data;
+    }
 
-contract TestComputationAndLogicalOperationsMachine {
+    function initBloomFilter() returns (bytes) {
+        return new bytes(256);
+    }
 
+    function updateBloomFilter(bytes filter, address loggersAddress, bytes32[] topics) returns (bytes) {
+        // stub return dummy value
+        return filter;
+    }
 }

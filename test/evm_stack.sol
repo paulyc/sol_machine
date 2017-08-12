@@ -22,10 +22,15 @@
 
 pragma solidity ^0.4.15;
 
-import '../evm_stack.sol';
+import '../contracts/evm_stack.sol';
+import './test_harness.sol';
 
-contract TestEvmStack {
+contract TestEvmStack is TestHarness {
     EvmStack stackUnderTest;
+
+    function TestEvmStack() TestHarness([testInit, testPush, testPop, testSwapTop]) {
+
+    }
 
     function testInit() {
         stackUnderTest = new EvmStack();

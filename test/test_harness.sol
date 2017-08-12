@@ -22,7 +22,17 @@
 
 pragma solidity ^0.4.15;
 
-import '../contracts/logging.sol';
+contract TestHarness {
+    event TestComplete();
 
-contract TestLogging {
+    function TestHarness(function()[4] testFuns) internal {
+        testFuns[0]();
+        TestComplete();
+        testFuns[1]();
+        TestComplete();
+        testFuns[2]();
+        TestComplete();
+        testFuns[3]();
+        TestComplete();
+    }
 }
