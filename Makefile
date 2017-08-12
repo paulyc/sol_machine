@@ -1,2 +1,8 @@
-compile: contracts/*.sol contracts/machine/*.sol test/*.sol
-	solc --allow-paths ${CURDIR}/contracts,${CURDIR}/contracts/machine,${CURDIR}/test,${CURDIR}/test/machine **/*.sol
+compile: contracts/*.sol test/*.sol
+	solc --allow-paths ${CURDIR}/contracts,${CURDIR}/test **/*.sol
+
+compile-bin: contracts/*.sol test/*.sol
+	solc --allow-paths ${CURDIR}/contracts,${CURDIR}/test --bin **/*.sol
+
+compile-abi: contracts/*.sol test/*.sol
+	solc --allow-paths ${CURDIR}/contracts,${CURDIR}/test --abi **/*.sol
