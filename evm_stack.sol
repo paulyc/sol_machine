@@ -36,24 +36,24 @@ contract EvmStack {
         return _stack[--_stackPointer];
     }
 
-    function top() returns (uint256) {
+    function top() constant returns (uint256) {
         require(_stackPointer > 0);
         return _stack[_stackPointer - 1];
     }
 
-    function isEmpty() returns (bool) {
+    function isEmpty() constant returns (bool) {
         return _stackPointer > 0;
     }
 
-    function size() returns (uint256) {
+    function size() constant returns (uint256) {
         return _stackPointer;
     }
 
-    function capacity() returns (uint256) {
+    function capacity() constant returns (uint256) {
         return _stack.length;
     }
 
-    function stackOffset(uint256 offset) returns (uint256) {
+    function stackOffset(uint256 offset) constant returns (uint256) {
         // this should probably be a debugging only facility
         require(_stackPointer > 0 && // must have at least one item on the stack
                 _stackPointer >= (offset + 1) && // and be out of neither the lower bound

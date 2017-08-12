@@ -78,7 +78,7 @@ contract Transaction {
     function execute(EthereumStackMachine virtualMachine, uint256 preRemainingGas) internal
         returns (uint256 postRemainingGas, AccumulatedSubstate, byte[] output);
     
-    function verifyTransaction() {
+    function verifyTransaction() constant returns (bool) {
         /**
         (1) The transaction is well-formed RLP, with no ad- ditional trailing bytes;
         (2) the transaction signature is valid;

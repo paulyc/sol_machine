@@ -87,7 +87,7 @@ contract ExecutionContext {
         }
     }
 
-    function getStack() returns (EvmStack) {
+    function getStack() constant returns (EvmStack) {
         return _state.stack;
     }
 
@@ -95,7 +95,7 @@ contract ExecutionContext {
         _state.status = ExecutionStatus.HALTED;
     }
 
-    function isHalted() returns (bool) {
+    function isHalted() constant returns (bool) {
         return _state.status == ExecutionStatus.HALTED;
     }
 
@@ -103,7 +103,7 @@ contract ExecutionContext {
         _state.gasConsumed += gas;
     }
 
-    function getGasConsumed() returns (uint256) {
+    function getGasConsumed() constant returns (uint256) {
         return _state.gasConsumed;
     }
 }

@@ -27,9 +27,6 @@ import '../evm_stack.sol';
 contract TestEvmStack {
     EvmStack stackUnderTest;
 
-    function TestStackOwner() {
-    }
-
     function testInit() {
         stackUnderTest = new EvmStack();
         require(stackUnderTest.isEmpty());
