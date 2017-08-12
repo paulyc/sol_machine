@@ -181,6 +181,9 @@ contract EthereumStackMachine is MachineCodeExecutor, StopAndArithmeticOperation
     // Halt Execution, Mark for Deletion
     byte constant OP_SELFDESTRUCT = 0xff;
 
+    event TransactionComplete();
+    event UnhandledException();
+
     struct AccountState {
         uint256 nonce;
         uint256 balance;
@@ -201,7 +204,8 @@ contract EthereumStackMachine is MachineCodeExecutor, StopAndArithmeticOperation
     }
 
     function illegalOperation(ExecutionContext context) {
-
+        UnhandledException();
+        revert();
     }
 
     function EthereumStackMachine() {
@@ -355,7 +359,7 @@ contract EthereumStackMachine is MachineCodeExecutor, StopAndArithmeticOperation
 
         // System Operations
         _operandDispatchTable[OP_CREATE];
-        _operandDispatchTable[OP_CALL  ];
+        _operandDispatchTable[OP_CALL];
         _operandDispatchTable[OP_CALLCODE];
         _operandDispatchTable[OP_RETURN];
         _operandDispatchTable[OP_DELEGATECALL];

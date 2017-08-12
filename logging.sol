@@ -25,7 +25,7 @@ pragma solidity ^0.4.15;
 library Logging {
     struct LogEntry {
         address loggersAddress;
-        byte[32][] topics;
+        bytes32[] topics;
         byte[] data;
     }
 
@@ -33,7 +33,7 @@ library Logging {
         return new bytes(256);
     }
 
-    function updateBloomFilter(bytes filter, address loggersAddress, byte[32][] topics) returns (bytes) {
+    function updateBloomFilter(bytes filter, address loggersAddress, bytes32[] topics) returns (bytes) {
         // stub return dummy value
         return filter;
     }
