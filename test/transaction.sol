@@ -22,7 +22,7 @@
 
 pragma solidity ^0.4.15;
 
-import '../transaction.sol';
+import '../contracts/transaction.sol';
 
 contract TestTransaction {
 }

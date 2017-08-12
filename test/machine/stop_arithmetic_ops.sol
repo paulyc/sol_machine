@@ -22,7 +22,7 @@
 
 pragma solidity ^0.4.15;
 
-import '../../machine/stop_arithmetic_ops.sol';
+import '../../contracts/machine/stop_arithmetic_ops.sol';
 
 contract TestStopAndArithmeticOperations {
     StopAndArithmeticOperations stackMachine;

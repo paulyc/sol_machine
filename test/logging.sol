@@ -22,7 +22,7 @@
 
 pragma solidity ^0.4.15;
 
-import '../logging.sol';
+import '../contracts/logging.sol';
 
 contract TestLogging {
 }

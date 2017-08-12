@@ -22,7 +22,7 @@
 
 pragma solidity ^0.4.15;
 
-import '../evm_stack.sol';
+import '../contracts/evm_stack.sol';
 import './test_harness.sol';
 
 contract TestEvmStack is TestHarness {

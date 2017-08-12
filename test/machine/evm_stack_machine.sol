@@ -22,7 +22,7 @@
 
 pragma solidity ^0.4.15;
 
-import '../../machine/evm_stack_machine.sol';
+import '../../contracts/machine/evm_stack_machine.sol';
 
 contract TestEthereumStackMachine {
 

@@ -22,7 +22,7 @@
 
 pragma solidity ^0.4.15;
 
-import '../../machine/comp_logic_ops.sol';
+import '../../contracts/machine/comp_logic_ops.sol';
 
 contract TestComputationAndLogicalOperationsMachine {
 

@@ -22,7 +22,7 @@
 
 pragma solidity ^0.4.15;
 
-import '../block.sol';
+import '../contracts/block.sol';
 
 contract TestBlock {
 }

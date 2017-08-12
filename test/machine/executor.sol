@@ -22,7 +22,7 @@
 
 pragma solidity ^0.4.15;
 
-import '../../machine/executor.sol';
+import '../../contracts/machine/executor.sol';
 
 contract TestExecutionContext {
 
