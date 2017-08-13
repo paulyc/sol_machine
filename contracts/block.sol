@@ -40,18 +40,26 @@ contract Block {
         uint64  nonce;         // A 64-bit hash which proves combined with the mix-hash that a sufficient amount of compu- tation has been carried out on this block; formally H_n.
     }
 
-    Header _blockHeader;
+    Header _header;
     Header[] _ommerBlockHeaders;
     Transaction[] _transactions;
 
     function Block(Header header, Header[] ommerBlockHeaders, Transaction[] transactions) internal {
-        _blockHeader = header;
+        _header = header;
         _ommerBlockHeaders = ommerBlockHeaders;
         _transactions = transactions;
     }
 
     function verify() constant {
     //
+    }
+
+    function findStateAndNonce() constant returns (uint256, uint64) {
+        return (0, 0);
+    }
+
+    function mine() {
+
     }
 
     function finalize() {

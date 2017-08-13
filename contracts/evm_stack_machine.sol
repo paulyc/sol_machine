@@ -37,10 +37,10 @@ contract EthereumStackMachine is Constants {
         address codeOwner;                  // I_a, the address of the account which owns the code that is executing
         address transactionOriginator;      // I_o, the sender address of the transaction that originated this execution.
         uint256 gasPrice;                   // I_p, the price of gas in the transaction that origi- nated this execution
-        byte[]  inputData;                  // I_d, the byte array that is the input data to this execution; if the execution agent is a transaction, this would be the transaction data
+        bytes   inputData;                  // I_d, the byte array that is the input data to this execution; if the execution agent is a transaction, this would be the transaction data
         address executor;                   // I_s, the address of the account which caused the code to be executing; if the execution agent is a transaction, this would be the transaction sender
         uint256 valuePassedWithExecution;   // I_v, the value, in Wei, passed to this account as part of the same procedure as execution; if the execution agent is a transaction, this would be the transaction value.
-        byte[]  machineCode;                // I_b, the byte array that is the machine code to be executed
+        bytes   machineCode;                // I_b, the byte array that is the machine code to be executed
         uint256 blockHeader;                // I_H, the block header of the present block
         uint256 callOrCreateDepth;          // I_e, the depth of the present message-call or contract-creation (i.e. the number of CALLs or CREATEs being executed at present)
     }
@@ -49,8 +49,8 @@ contract EthereumStackMachine is Constants {
         uint256[1024] stack;
         uint16 stackPointer;
 
-        uint256[]  memory_;
-        mapping(uint256 => uint256) storage_;
+        //uint256[]  memory_;
+        //mapping(uint256 => uint256) storage_;
 
         uint256 gasAvailable;
         uint256 gasConsumed;
@@ -60,43 +60,63 @@ contract EthereumStackMachine is Constants {
         ExecutionEnvironment environment;
     }
 
-    function executeTransaction(ContractCreationTransaction transaction) {
-        SystemState state;
+    struct StorageTrie {
 
-        //bytes storage program = transaction.getProgram();
-        bytes program;
+    }
+
+    mapping(uint256 => uint256) _storage;
+    struct AccountState {
+        uint256 nonce;
+        uint256 balance;
+        uint256 storageRoot;
+        uint256 codeHash;
+    }
+
+    mapping(address => AccountState) _worldState;
+
+    function executeContractTransaction(uint256 gasPrice, uint256 gasLimit, address to, uint256 value, uint8 v, uint256 r, uint256 s, bytes init) {
+        // todo: verify
+        ContractCreationTransaction transaction = new ContractCreationTransaction(gasPrice, gasLimit, to, value, v, r, s, init);
+        executeBinary(init);
+        TransactionComplete(transaction);
+    }
+
+    function executeBinary(bytes program) {
+        SystemState memory state;
+        state.environment.machineCode = program;
         state.status = ExecutionStatus.EXECUTING;
 
         while (state.status != ExecutionStatus.HALTED && state.programCounter < program.length) {
             byte opCode = program[state.programCounter++];
             dispatchInstruction(opCode, state);
         }
+        ProgramComplete(state.programCounter);
     }
 
-    function executeStop(SystemState state) internal {
+    function executeStop(SystemState memory state) internal {
         state.status = ExecutionStatus.HALTED;
         state.gasConsumed++;
     }
 
-    function executeAdd(SystemState state) internal {
+    function executeAdd(SystemState memory state) internal {
         require(state.stackPointer-- >= 2);
         state.stack[state.stackPointer - 1] += state.stack[state.stackPointer];
         state.gasConsumed++;
     }
 
-    function executeMul(SystemState state) internal {
+    function executeMul(SystemState memory state) internal {
         require(state.stackPointer-- >= 2);
         state.stack[state.stackPointer - 1] *= state.stack[state.stackPointer];
         state.gasConsumed++;
     }
 
-    function executeSub(SystemState state) internal {
+    function executeSub(SystemState memory state) internal {
         require(state.stackPointer-- >= 2);
         state.stack[state.stackPointer - 1] = state.stack[state.stackPointer] - state.stack[state.stackPointer - 1];
         state.gasConsumed++;
     }
 
-    function executeDiv(SystemState state) internal {
+    function executeDiv(SystemState memory state) internal {
         require(state.stackPointer-- >= 2);
         if (state.stack[state.stackPointer - 1] == 0) {
             // no op, leave 0 in result
@@ -106,7 +126,7 @@ contract EthereumStackMachine is Constants {
         state.gasConsumed++;
     }
 
-    function executeSdiv(SystemState state) internal {
+    function executeSdiv(SystemState memory state) internal {
         require(state.stackPointer-- >= 2);
         if (state.stack[state.stackPointer - 1] == 0) {
             // no op, leave 0 in result
@@ -122,7 +142,7 @@ contract EthereumStackMachine is Constants {
         state.gasConsumed++;
     }
 
-    function executeMod(SystemState state) internal {
+    function executeMod(SystemState memory state) internal {
         require(state.stackPointer-- >= 2);
         if (state.stack[state.stackPointer - 1] == 0) {
             // no op, leave 0 in result
@@ -132,7 +152,7 @@ contract EthereumStackMachine is Constants {
         state.gasConsumed++;
     }
 
-    function executeSmod(SystemState state) internal {
+    function executeSmod(SystemState memory state) internal {
         require(state.stackPointer-- >= 2);
         if (state.stack[state.stackPointer - 1] == 0) {
             // no op, leave 0 in result
@@ -142,56 +162,48 @@ contract EthereumStackMachine is Constants {
         state.gasConsumed++;
     }
 
-    function executeAddmod(SystemState state) internal {
+    function executeAddmod(SystemState memory state) internal {
         // stubbed no-op
     }
 
-    function executeMulmod(SystemState state) internal {
+    function executeMulmod(SystemState memory state) internal {
         // stubbed no-op
     }
 
-    function executeExp(SystemState state) internal {
+    function executeExp(SystemState memory state) internal {
         // stubbed no-op
     }
 
-    function executeSignextend(SystemState state) internal {
+    function executeSignextend(SystemState memory state) internal {
         // stubbed no-op
     }
 
-    function illegalOperation(SystemState state) internal {
+    function illegalOperation(SystemState memory state) internal {
         UnhandledException(state.programCounter);
         revert();
     }
 
-    event TransactionComplete(Transaction);
+    event TransactionComplete(Transaction transaction);
     event UnhandledException(uint256 programCounter);
+    event ProgramComplete(uint256 programCounter);
 
-    function dispatchInstruction(byte OpCode,  SystemState state) internal {
-        /*assembly {
+    function dispatchInstruction(byte OpCode, SystemState memory state) internal {
+        function(SystemState memory) internal fun;
+        assembly {
             switch OpCode
             // Stop and Arithmetic Operations
-            case 0x00 { call() } // OP_STOP
-            case 0x01 { executeAdd(state) } // OP_ADD
-            case 0x02 { executeMul(state) }
-            default   { illegalOperation(state) }
-        }*/
-        if (OpCode == OP_STOP) {
-            executeStop(state);
-        } else {
-            illegalOperation(state);
-        }
-    }
-
-    /*
-            // OP_SUB            = executeSub;
-            // OP_DIV            = executeDiv;
-            // OP_SDIV           = executeSdiv;
-            // OP_MOD            = executeMod;
-            // OP_SMOD           = executeSmod;
-            // OP_ADDMOD         = executeAddmod;
-            // OP_MULMOD         = executeMulmod;
-            // OP_EXP            = executeExp;
-            // OP_SIGNEXTEND     = executeSignextend;
+            case 0x00 { fun := executeStop }        // OP_STOP
+            case 0x01 { fun := executeAdd }         // OP_ADD
+            case 0x02 { fun := executeMul }         // OP_MUL
+            case 0x03 { fun := executeSub }         // OP_SUB
+            case 0x04 { fun := executeDiv }         // OP_DIV
+            case 0x05 { fun := executeSdiv }        // OP_SDIV
+            case 0x06 { fun := executeMod }         // OP_MOD
+            case 0x07 { fun := executeSmod }        // OP_SMOD
+            case 0x08 { fun := executeAddmod }      // OP_ADDMOD
+            case 0x09 { fun := executeMulmod }      // OP_MULMOD
+            case 0x0a { fun := executeExp }         // OP_EXP
+            case 0x0b { fun := executeSignextend }  // OP_SIGNEXTEND
 
             // Comparison and Bitwise Logic Operations
             // OP_LT
@@ -331,5 +343,10 @@ contract EthereumStackMachine is Constants {
             // OP_DELEGATECALL
 
             // Halt Execution, Mark for Deletion
-            // OP_SELFDESTRUCT **/
+            // OP_SELFDESTRUCT
+            default   { fun := illegalOperation }
+        }
+        fun(state);
+    }
+
 }

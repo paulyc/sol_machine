@@ -70,7 +70,7 @@ contract Transaction {
         _initOrInput = initOrInput;
     }
     
-    function verifyTransaction() constant returns (bool) {
+    function verify() constant returns (bool) {
         /**
         (1) The transaction is well-formed RLP, with no ad- ditional trailing bytes;
         (2) the transaction signature is valid;
@@ -82,28 +82,22 @@ contract Transaction {
         cost, v0, required in up-front payment.
     */
     }
-
-    function getInitOrInput() constant public returns (bytes) {
-        return _initOrInput;
-    }
 }
 
 contract ContractCreationTransaction is Transaction {
 
     // init: An unlimited size byte array specifying the EVM-code for the account initialisation proce- dure, formally T_i.
-    function ContractCreationTransaction(bytes init, uint256 gasPrice, uint256 gasLimit, address to, uint256 value, uint8 v, uint256 r, uint256 s)
+    function ContractCreationTransaction(uint256 gasPrice, uint256 gasLimit, address to, uint256 value, uint8 v, uint256 r, uint256 s, bytes init)
         Transaction(gasPrice, gasLimit, to, value, v, r, s, init) {
     }
 
     AccumulatedSubstate substate;
-    function getProgram() constant public returns (bytes) {
-        return getInitOrInput();
-    }
+
 }
 
 contract MessageCallTransaction is Transaction {
     // init: An unlimited size byte array specifying the input data of the message call, formally T_d
-    function MessageCallTransaction(bytes init, uint256 gasPrice, uint256 gasLimit, address to, uint256 value, uint8 v, uint256 r, uint256 s)
+    function MessageCallTransaction(uint256 gasPrice, uint256 gasLimit, address to, uint256 value, uint8 v, uint256 r, uint256 s, bytes init)
         Transaction(gasPrice, gasLimit, to, value, v, r, s, init) {
     }
 }
